@@ -1,0 +1,44 @@
+.footer-menu-font{
+font-size: 17px;
+}
+.dropdown-toggle::after {
+    display:none;
+}
+div.main_body{
+display: block;
+min-width: 920px;
+max-width: 1080px;
+margin: auto;
+}
+body {
+  padding-top: 5.5rem;
+}
+.navbar-right{
+margin-right: 15rem;
+}
+.sign_up_form{
+max-width: 600px;
+}
+.solve_indicator{
+  height: 25px;
+  width: 25px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+}
+hr.solid_sep{
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border: 0;
+  border-top: 3px solid rgba(0, 0, 0, 0.1);
+}
+div.main_len_adj{
+min-height: 600px;
+}
+span.solve_indicator{
+    height: 15px;
+    width: 15px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+}

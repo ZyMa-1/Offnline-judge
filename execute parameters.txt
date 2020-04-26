@@ -1,0 +1,3 @@
+{
+	"cpp": "g++ -static -fno-strict-aliasing -DACMP -lm -s -x c++ -std=c++14 -Wl,--stack=67108864 -O2 -o solution.exe solution.cpp"
+}
