@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- code mirror -->
+    <link rel="stylesheet" type="text/css" href="/static/plugin/codemirror/lib/codemirror.css">
+    <script src="/static/plugin/codemirror/lib/codemirror.js"></script>
+    <script src="/static/plugin/codemirror/mode/javascript/javascript.js"></script>
+    <script src="/static/plugin/codemirror/mode/css/css.js"></script>
+    <link rel="stylesheet" href="/static/plugin/codemirror/theme/darcula.css">
+    <!-- code mirror -->
+    <div class="problem_tabs nav-expand-lg">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" href="#">Problem Statement</a>
+            </li>
+            {% if current_user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link" href="#">My submissions</a>
+            </li>
+            {% endif %}
+        </ul>
+        <div class="problem_content mx-5 pt-4">
+            <p class="h3" align="center">{{ problem.title }}</p>
+            <br>
+            <div class="fak_margin">
+                <p class="problem_limit_text"><b>Time limit:</b> {{ problem.time_limit }} sec</p>
+            </div>
+            <div class="fak_margin">
+                <p class="problem_limit_text"><b>Memory limit:</b> {{ problem.memory_limit }} MB</p>
+            </div>
+            <div class="fak_margin">
+                <span class="problem_limit_text gray_separator"><b>Allowed languages:</b> C++11</span>
+            </div>
+            {% include statement %}
+            <br>
+            <div class="row">
+                <div class="col-sm-2">
+                    <p class="h4">Code Editor</p>
+                </div>
+                <div class="col">
+                    <span class="code_editor_separator"></span>
+                </div>
+            </div>
+            <br>
+            <div class="d-flex justify-content-right">
+                <div class="col-md-2 ml-auto px-0" align="center">
+                    <p class="mt-2" align="right">Select Language: </p>
+                </div>
+                <div class="col-md-2">
+                    <select id="language" name="language" class="form-control ml-auto" align="right">
+                        <option selected value="0">GNU C++11</option>
+                    </select>
+                </div>
+                <div class="col-md-2 px-0" style="max-width: 100px;" align="center">
+                    <p class="mt-2" align="right">Select theme: </p>
+                </div>
+                <div class="col-md-2">
+                    <select id="theme_select" class="form-control ml-auto" align="right" onchange="selectTheme()">
+                        <option selected value="0">default</option>
+                        <option value="1">darcula</option>
+                    </select>
+                </div>
+            </div>
+            <form class="mt-1" action="" method="post" id="code-form">
+                {{ form.hidden_tag() }}
+                {{ form.csrf_token }}
+                <textarea id="code_area" name="code_area"></textarea>
+                <br>
+                <p>{{ form.submit(type="submit", class="btn btn-primary ml-2") }}</p>
+            </form>
+        </div>
+    </div>
+    <!-- editor_theme_change(and other stuff) -->
+    <script type="text/javascript" src="/static/js/default.js"></script>
+{% endblock %}

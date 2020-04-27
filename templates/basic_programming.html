@@ -4,12 +4,27 @@
 <h3 align="center">Problems</h3>
 <hr class="solid solid_sep">
 <br>
-<div id="prob-list-container">
+<div id="prob-list-container mb-1">
     <ul class="list-group">
-        <li class="list-group-item">
-            <span class="solve_indicator"></span>
-        </li>
+        {% for problem in problems%}
+            <li class="list-group-item pt-1">
+                <div class="row">
+                    <div class="col">
+                        <div class="problem_container row float-left center-block mx-auto">
+                            <span class="solve_indicator"></span>
+                            <a class="problem_title mb-0 my-auto ml-3" align="center" href="/practice/basic_programming/problems/{{ problem.id }}">{{ problem.title }}</a>
+                        </div>
+                        <div class="problem_container row float-right center-block">
+                            <p class="text-secondary my-auto mr-2">Solved by: {{ problem.solves }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <p class="text-secondary ml-3 my-auto">Time limit: {{ problem.time_limit }} sec</p>
+                    <p class="text-secondary ml-3 my-auto">Memory limit: {{ problem.memory_limit }} MB</p>
+                </div>
+            </li>
+        {% endfor %}
     </ul>
 </div>
-
 {% endblock %}

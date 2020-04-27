@@ -19,3 +19,7 @@ class LogInForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember me')
     submit = SubmitField('Submit')
+
+
+class SubmitForm(FlaskForm):
+    submit = SubmitField('Submit')

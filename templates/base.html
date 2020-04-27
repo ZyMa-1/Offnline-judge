@@ -3,15 +3,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-    <link rel="stylesheet"
-          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-          crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="{{ main_css }}"/>
+    <script src="/static/js/jquery_1.11.1_min.js"></script>
+    <script src="/static/js/bootstrap_4.4.1_min.js"></script>
+    <link rel="stylesheet" href="/static/css/bootstrap_4.4.1_min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css"/>
     <title>{{ title }}</title>
+    {% if message %}
+        <div id="inner-message" class="alert alert-fixed alert-warning ml-5" role="alert" id="alert-warning">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+    {% endif %}
+</div>
 </head>
 <body>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
@@ -48,7 +51,7 @@
             </ul>
             <ul class="navbar-nav navbar-right">
                 {% if current_user.is_authenticated %}
-                <a href="#"><img src="{{ user_icon }}" class="rounded-circle" alt="{{ current_user.login }}"></a>
+                <a href="#"><img src="{{ user_icon }}" class="rounded-circle" title="{{ current_user.login }}"></a>
                 <li class="nav-item dropdown ml-2">
                     <a class="nav-link dropdown-toggle" href="#" id="profile_dropdown" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false">⯆</a>
@@ -74,5 +77,8 @@
     <main role="main" class="container">
         {% block content %}{% endblock %}
     </main>
+    <footer class="footer text-center">
+        <span class="text-muted">Yes, but actually no</span>
+    </footer>
 </body>
 </html>

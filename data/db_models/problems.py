@@ -8,6 +8,6 @@ class Problem(SqlAlchemyBase, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     title = sqlalchemy.Column(sqlalchemy.String)
-    solved_by = sqlalchemy.Column(sqlalchemy.Integer)
-    time_limit = sqlalchemy.Column(sqlalchemy.Integer)
+    time_limit = sqlalchemy.Column(sqlalchemy.Float)
     memory_limit = sqlalchemy.Column(sqlalchemy.Integer)
+    solves = sqlalchemy.Column(sqlalchemy.Integer)

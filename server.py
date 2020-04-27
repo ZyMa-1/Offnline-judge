@@ -40,6 +40,12 @@ def after_request(response):
     return response
 
 
+def remove_cache():
+    response = make_response(url_for('sign_up'))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+
+
 @app.route("/")
 def start_page():
     return redirect('/home')
@@ -47,9 +53,8 @@ def start_page():
 
 def base_params(title, navbar_active_tab_id):
     params = {
-        "main_css": url_for('static', filename='css/main.css'),
         "title": title,
-        "navbar_active_tab_id": navbar_active_tab_id
+        "navbar_active_tab_id": navbar_active_tab_id,
     }
     if current_user.is_authenticated:
         params["user_icon"] = url_for("static", filename=f"user_data/icons/{current_user.icon_id}.png")
@@ -93,11 +98,6 @@ def sign_up():
         open(path, 'wb').write(open(f"data/default/user_icons/user_icon_{num}.png", "rb").read())
         resize_image(path)
         return icon_id
-
-    # Removing Cache
-    response = make_response(url_for('sign_up'))
-    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response.headers['Pragma'] = 'no-cache'
 
     form = SignUpForm()
     params = base_params("Sign up", -1)
@@ -161,9 +161,32 @@ def practice():
 
 @app.route('/practice/basic_programming', methods=['GET', 'POST'])
 def basic_programming():
+    session = db_session.create_session()
     params = base_params("Basic Programming", 1)
+    params["problems"] = session.query(Problem).all()
     return render_template('basic_programming.html', **params)
+
+
+@app.route('/practice/basic_programming/problems/<int:problem_id>', methods=['GET', 'POST'])
+def basic_programming_problem(problem_id):
+    session = db_session.create_session()
+    form = SubmitForm()
+    params = base_params("Basic Programming", 1)
+    params["statement"] = f"problems/{problem_id}/statement.html"
+    params["problem"] = session.query(Problem).filter(Problem.id == problem_id).first()
+    params["form"] = form
+    if form.validate_on_submit():
+        code = request.form["code_area"]
+        if code == "":
+            params["message"] = "You can't submit empty code"
+            return render_template('problem.html', **params)
+        if not current_user.is_authenticated:
+            params["message"] = "You must sign in to submit code"
+            return render_template('problem.html', **params)
+        return redirect('/practice/basic_programming')
+    return render_template('problem.html', **params)
 
 
 if __name__ == '__main__':
     main()
+    print('wa')
