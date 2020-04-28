@@ -11,11 +11,11 @@
     <div class="problem_tabs nav-expand-lg">
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link active" href="#">Problem Statement</a>
+                <a class="nav-link active" href="/practice/basic_programming/problems/{{ problem.id }}">Problem Statement</a>
             </li>
             {% if current_user.is_authenticated %}
             <li class="nav-item">
-                <a class="nav-link" href="#">My submissions</a>
+                <a class="nav-link" href="/practice/basic_programming/problems/{{ problem.id }}/my_submissions">My submissions</a>
             </li>
             {% endif %}
         </ul>
@@ -67,6 +67,7 @@
                 <textarea id="code_area" name="code_area"></textarea>
                 <br>
                 <p>{{ form.submit(type="submit", class="btn btn-primary ml-2") }}</p>
+                <br>
             </form>
         </div>
     </div>

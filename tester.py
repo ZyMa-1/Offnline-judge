@@ -1,157 +1,100 @@
-from PIL import Image
-from flask import Flask, render_template, url_for, redirect, request, session, abort, make_response, jsonify
-from flask_login import LoginManager, current_user
-
-from wt_forms import *
+import datetime
+import subprocess
+import os
+from time import sleep
 
 from data.db_models import db_session
-
+from data.db_models import users
+from data.db_models import problems
 from data.db_models.submissions import *
-from data.db_models.problems import *
-from data.db_models.users import *
 
-import os
-from random import randint
+import schedule
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'This miss is pretty sad, but fuck it (C) WhiteCat'
 
-login_manager = LoginManager()
-login_manager.init_app(app)
+def test_submission(submission, results):
+    submission_path = f'data/testing_system/submissions/{submission.id}'
+    problem_path = f'data/problems/{submission.problem_id}/tests'
 
-@login_manager.user_loader
-def load_user(user_id):
+    def delete_temp_files():
+        os.remove(f'{submission_path}/submission.exe')
+        os.remove(f'{submission_path}/input.txt')
+        os.remove(f'{submission_path}/output.txt')
+
+    os.rename(f'{submission_path}/{os.listdir(submission_path)[0]}', f'{submission_path}/submission.cpp')
+    process = os.system(
+        f"g++ -static -fno-strict-aliasing -DACMP -lm -s -x c++ -std=c++14 -Wl,--stack=67108864 -O2 -o {submission_path}/submission.exe {submission_path}/submission.cpp")
+    if process != 0:
+        results[submission.id] = {
+            'status': 'CE',
+            'running_time': 0
+        }
+        return
+    test_num = 1
+    max_running_time = 0
+    for filename in os.listdir(f'{problem_path}/input'):
+        input = open(f'{problem_path}/input/{filename}', 'r').read()
+        output = open(f'{problem_path}/output/{filename}', 'r').read()
+
+        open(f'{submission_path}/input.txt', 'w').write(input)
+        start = datetime.now()
+        subprocess.Popen(f"{submission_path}/submission.exe", stdin=open(f"{submission_path}/input.txt", "r"),
+                         stdout=open(f"{submission_path}/output.txt", "w"))
+        current_running_time = datetime.now() - start
+        seconds = current_running_time.microseconds / 1000000
+        max_running_time = max(max_running_time, seconds)
+        sleep(.1)
+        if max_running_time > submission.problem.time_limit:
+            results[submission.id] = {
+                'status': f"TLE {test_num}",
+                'running_time': submission.problem.time_limit
+            }
+            return
+        if open(f"{submission_path}/output.txt", "r").read() != output:
+            delete_temp_files()
+            results[submission.id] = {
+                'status': f"WA {test_num}",
+                'running_time': max_running_time
+            }
+            return
+        test_num += 1
+    delete_temp_files()
+    results[submission.id] = {
+        'running_time': max_running_time,
+        'status': 'AC'
+    }
+    return
+
+
+def test_all_submissions():
+    res = {}
     session = db_session.create_session()
-    return session.query(User).get(user_id)
+    submissions = session.query(Submission).filter(Submission.status == "In queue")
+    for submission in submissions:
+        test_submission(submission, res)
+    for submission in submissions:
+        submission.status = res[submission.id]['status']
+        submission.running_time = res[submission.id]['running_time']
+    session.commit()
+    """
+    processes = []
+    for submission in submissions:
+        p = multiprocessing.Process(target=test_submission, args=[submission, results])
+        processes.append(p)
+        p.start()
+
+    for process in processes:
+        process.join()
+    for submission in submissions:
+        submission.status = results[submission.id]['status']
+        submission.running_time = results[submission.id]['running_time']
+    session.commit()
+    print(datetime.now() - start)
+    print(results)
+    """
 
 
-def main():
+def test_forever():
     db_session.global_init("data/db/main.sqlite")
-    app.run(port=8080)
-
-
-# Removing Cache
-@app.after_request
-def after_request(response):
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, public, max-age=0"
-    response.headers["Expires"] = '0'
-    response.headers["Pragma"] = "no-cache"
-    return response
-
-
-@app.route("/")
-def start_page():
-    return redirect('/home')
-
-
-@app.route("/home")
-def home_page():
-    params = {
-        "main_css": url_for('static', filename='css/main.css'),
-        "title": "Home page",
-    }
-    if current_user.is_authenticated:
-        params["user_icon"] = url_for('data', filename=f'user_data/icons/{current_user.icon_id}.png')
-    return render_template("home_page.html", **params)
-
-
-@app.route('/sign_up', methods=['GET', 'POST'])
-def sign_up():
-    def resize_image(path):
-        image = Image.open(path)
-        image = image.resize((64, 64))
-        image.save(path)
-
-    def generate_icon_name():
-        save_path = "data/user_data/icons"
-        icon_id = randint(100000000, 999999999)
-        icon_name = f"{icon_id}.png"
-        while icon_name in os.listdir(save_path):
-            icon_id = randint(100000000, 999999999)
-            icon_name = f"{icon_id}.png"
-        return icon_id, icon_name
-
-    def save_custom_user_icon(img):
-        icon_id, icon_name = generate_icon_name()
-        path = f"data/user_data/icons/{icon_name}"
-        open(path, 'wb').write(img.read())
-        resize_image(path)
-
-    def save_default_user_icon():
-        num = randint(1, 3)  # 1-number of default icons
-        icon_id, icon_name = generate_icon_name()
-        path = f"data/user_data/icons/{icon_name}"
-        open(path, 'wb').write(open(f"data/default/user_icons/user_icon_{num}.png", "rb").read())
-        resize_image(path)
-
-    # Removing Cache
-    response = make_response(url_for('sign_up'))
-    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response.headers['Pragma'] = 'no-cache'
-
-    form = SignUpForm()
-    params = {
-        "main_css": url_for('static', filename='css/main.css'),
-        "title": "Sign up",
-        "form": form
-    }
-    if current_user.is_authenticated:
-        params["user_icon"] = url_for('data', filename=f'user_data/icons/{current_user.icon_id}.png')
-    if form.validate_on_submit():
-        if form.password.data != form.password_repeat.data:
-            params["password_error_message"] = "Password mismatch"
-            return render_template('sign_up.html', **params)
-        session = db_session.create_session()
-        if session.query(User).filter(User.login == form.login.data).first():
-            params["login_error_message"] = "This username already exists"
-            return render_template('sign_up.html', **params)
-        if session.query(User).filter(User.email == form.email.data).first():
-            params["email_error_message"] = "This email already exists"
-            return render_template('sign_up.html', **params)
-        user = User(
-            login=form.login.data,
-            email=form.email.data,
-        )
-        if form.icon.data.read() == b'':
-            save_default_user_icon()
-        else:
-            save_custom_user_icon(form.icon.data)
-        user.set_password(form.password.data)
-        session.add(user)
-        session.commit()
-        return redirect('/home')
-    return render_template('sign_up.html', **params)
-
-
-@app.route('/log_in', methods=['GET', 'POST'])
-def log_in():
-    form = RegisterForm()
-    params = {
-        "main_css": url_for('static', filename='css/main.css'),
-        "title": "Log in",
-        "form": form
-    }
-    if form.validate_on_submit():
-        if form.password.data != form.password_repeat.data:
-            params["password_error_message"] = "Password mismatch"
-            return render_template('sign_up.html', **params)
-        session = db_session.create_session()
-        if session.query(User).filter(User.login == form.login.data).first():
-            params["username_error_message"] = "This username already exists"
-            return render_template('sign_up.html', **params)
-        if session.query(User).filter(User.email == form.email.data).first():
-            params["email_error_message"] = "This email already exists"
-            return render_template('sign_up.html', **params)
-        user = User(
-            login=form.login.data,
-            email=form.email.data,
-        )
-        user.set_password(form.password.data)
-        session.add(user)
-        session.commit()
-        return redirect('/home')
-    return render_template('sign_up.html', **params)
-
-
-if __name__ == '__main__':
-    main()
+    schedule.every(1).seconds.do(test_all_submissions)
+    while 1:
+        schedule.run_pending()

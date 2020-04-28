@@ -3,6 +3,7 @@ var editor = CodeMirror.fromTextArea(document.getElementById("code_area"), {
 	styleActiveLine: true,
 	matchBrackets: true
 });
+editor.setSize(null, 600);
 
 var theme_select = document.getElementById("theme_select");
 

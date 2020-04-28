@@ -1,7 +1,7 @@
 from PIL import Image
 from flask import Flask, render_template, url_for, redirect, request, session, abort, make_response, jsonify
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
-
+from sqlalchemy import func as sqlalchemy_func
 from wt_forms import *
 
 from data.db_models import db_session
@@ -12,6 +12,10 @@ from data.db_models.users import *
 
 import os
 from random import randint
+
+import multiprocessing
+
+from tester import test_forever
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'This miss is pretty sad, but fuck it (C) WhiteCat'
@@ -27,8 +31,16 @@ def load_user(user_id):
 
 
 def main():
+    processes = []
     db_session.global_init("data/db/main.sqlite")
-    app.run(port=8080)
+    p = multiprocessing.Process(target=test_forever)
+    processes.append(p)
+    p.start()
+    p = multiprocessing.Process(target=app.run(port=8080))
+    processes.append(p)
+    p.start()
+    for process in processes:
+        process.join()
 
 
 # Removing Cache
@@ -153,7 +165,7 @@ def logout():
     return redirect("/home")
 
 
-@app.route('/practice', methods=['GET', 'POST'])
+@app.route('/practice', methods=['GET'])
 def practice():
     params = base_params("Practice", 1)
     return render_template('practice.html', **params)
@@ -183,10 +195,33 @@ def basic_programming_problem(problem_id):
         if not current_user.is_authenticated:
             params["message"] = "You must sign in to submit code"
             return render_template('problem.html', **params)
-        return redirect('/practice/basic_programming')
+        submission_id = session.query(sqlalchemy_func.max(Submission.id)).one()[0] + 1
+        submission_folder = f'data/testing_system/submissions/{submission_id}'
+        os.mkdir(f'data/testing_system/submissions/{submission_id}')
+        open(f"{submission_folder}/solution.cpp", "w").write(code)
+        submission = Submission(
+            id=submission_id,
+            user_id=current_user.id,
+            problem_id=problem_id,
+            status="In queue",
+        )
+        session.add(submission)
+        session.commit()
+        return redirect(f'/practice/basic_programming/problems/{problem_id}/my_submissions')
     return render_template('problem.html', **params)
+
+
+@app.route('/practice/basic_programming/problems/<int:problem_id>/my_submissions', methods=['GET'])
+@login_required
+def basic_programming_my_submissions(problem_id):
+    session = db_session.create_session()
+    submissions = session.query(Submission).filter(Submission.user_id == current_user.id).order_by(
+        Submission.sending_time.desc())
+    params = base_params("Basic Programming", 1)
+    params["statement"] = f"problems/{problem_id}/statement.html"
+    params["submissions"] = submissions
+    return render_template('my_submissions.html', **params)
 
 
 if __name__ == '__main__':
     main()
-    print('wa')
