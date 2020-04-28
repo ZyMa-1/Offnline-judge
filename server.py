@@ -13,6 +13,8 @@ from data.db_models.users import *
 import os
 from random import randint
 
+from time import sleep
+
 import multiprocessing
 
 from tester import test_forever
@@ -198,7 +200,7 @@ def basic_programming_problem(problem_id):
         submission_id = session.query(sqlalchemy_func.max(Submission.id)).one()[0] + 1
         submission_folder = f'data/testing_system/submissions/{submission_id}'
         os.mkdir(f'data/testing_system/submissions/{submission_id}')
-        open(f"{submission_folder}/solution.cpp", "w").write(code)
+        open(f"{submission_folder}/solution.cpp", "w").writelines([line.rstrip('\n') for line in code])
         submission = Submission(
             id=submission_id,
             user_id=current_user.id,
@@ -207,6 +209,7 @@ def basic_programming_problem(problem_id):
         )
         session.add(submission)
         session.commit()
+        sleep(.5)
         return redirect(f'/practice/basic_programming/problems/{problem_id}/my_submissions')
     return render_template('problem.html', **params)
 
@@ -220,7 +223,18 @@ def basic_programming_my_submissions(problem_id):
     params = base_params("Basic Programming", 1)
     params["statement"] = f"problems/{problem_id}/statement.html"
     params["submissions"] = submissions
+    params["problem"] = session.query(Problem).filter(Problem.id == problem_id).first()
     return render_template('my_submissions.html', **params)
+
+
+@app.route('/practice/submissions/<int:submission_id>', methods=['GET'])
+@login_required
+def submission(submission_id):
+    session = db_session.create_session()
+    params = base_params("Basic Programming", 1)
+    params["code"] = open(f"data/testing_system/submissions/{submission_id}/submission.cpp", "r").read()
+    params["submission"] = session.query(Submission).filter(Submission.id == submission_id).first()
+    return render_template('submission.html', **params)
 
 
 if __name__ == '__main__':

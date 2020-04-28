@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- code mirror -->
+    <link rel="stylesheet" type="text/css" href="/static/plugin/codemirror/lib/codemirror.css">
+    <script src="/static/plugin/codemirror/lib/codemirror.js"></script>
+    <script src="/static/plugin/codemirror/mode/javascript/javascript.js"></script>
+    <script src="/static/plugin/codemirror/mode/css/css.js"></script>
+    <link rel="stylesheet" href="/static/plugin/codemirror/theme/darcula.css">
+    <!-- code mirror -->
+    <div class="problem_tabs nav-expand-lg">
+        <div class="problem_content mx-5 pt-4">
+            <!-- <span onclick="goBack()" class="glyphicon glyphicon-chevron-left">test</span> -->
+            <table class="table table-bordered mx-2 mt-3">
+                <tr>
+                    <td class="submission_item">
+                        <pre class="mb-0 px-0 py-1">Submission id</pre>
+                    </td>
+                    <td class="submission_item">
+                        <pre class="mb-0 px-0 py-1">Author</pre>
+                    </td>
+                    <td class="submission_item">
+                        <pre class="mb-0 px-0 py-1">Problem</pre>
+                    </td>
+                    <td class="submission_item">
+                        <pre class="mb-0 px-0 py-1">Sending time</pre>
+                    </td>
+                    <td class="submission_item">
+                        <pre class="mb-0 px-0 py-1">Language</pre>
+                    </td>
+                    <td class="submission_item">
+                        <pre class="mb-0 px-0 py-1">Status</pre>
+                    </td>
+                    <td class="submission_item">
+                        <pre class="mb-0 px-0 py-1">Time</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="submission_item ">
+                        <pre class="mb-0 px-0 py-1">{{ submission.id }}</pre>
+                    </td>
+                    <td class="submission_item">
+                        <pre class="mb-0 px-0 py-1">{{ submission.user.login }}</pre>
+                    </td>
+                    <td class="submission_item">
+                        <pre class="mb-0 px-0 py-1">{{ submission.problem.title }}</pre>
+                    </td>
+                    <td class="submission_item">
+                        <pre class="mb-0 px-0 py-1">{{ ((submission.sending_time)|string).split('.')[0] }}</pre>
+                    </td>
+                    <td class="submission_item">
+                        <pre class="mb-0 px-0 py-1">GNU C++11</pre>
+                    </td>
+                    {% if submission.status == "AC" %}
+                    <td class="submission_item alert-success">
+                        <pre class="mb-0 px-0 py-1">{{ submission.status }}</pre>
+                    </td>
+                    {% elif "WA" in submission.status %}
+                    <td class="submission_item alert-danger">
+                        <pre class="mb-0 px-0 py-1">{{ submission.status }}</pre>
+                    </td>
+                    {% else %}
+                    <td class="submission_item alert-warning">
+                        <pre class="mb-0 px-0 py-1">{{ submission.status }}</pre>
+                    </td>
+                    {% endif %}
+                    <td class="submission_item">
+                        <pre class="mb-0 px-0 py-1">{{ (submission.running_time * 1000)|int }} ms</pre>
+                    </td>
+                </tr>
+            </table>
+            <div class="d-flex justify-content-right">
+                <div class="col-md-0 px-0 ml-auto">
+                    <button onclick="copyCode('#code_area')" class="btn btn-outline-dark btn-sm mr-3 mt-1">Copy</button>
+                </div>
+                <div class="col-md-2 px-0" style="max-width: 100px;" align="center">
+                    <p class="mt-2" align="right">Select theme: </p>
+                </div>
+                <div class="col-md-2">
+                    <select id="theme_select" class="form-control ml-auto" align="right" onchange="selectTheme()">
+                        <option selected value="0">default</option>
+                        <option value="1">darcula</option>
+                    </select>
+                </div>
+            </div>
+            <textarea id="code_area" name="code_area">{{ code }}</textarea>
+        </div>
+    </div>
+    <!-- editor_theme_change(and other stuff) -->
+    <script type="text/javascript" src="/static/js/submission.js"></script>
+{% endblock %}

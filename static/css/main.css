@@ -125,6 +125,19 @@ span.code_editor_separator{
 td.submission_item{
     text-align: center;
     padding: 0;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+}
+td.to_problem:hover{
+    background-color: rgb(205, 235, 255);
+}
+pre.to_problem{
+    text-decoration: none;
+    color: rgb(100, 100, 100);
+}
+pre.to_problem:hover{
+    color: rgb(0, 0, 0);
+}
+a.no_dec{
+    text-decoration: None
 }
