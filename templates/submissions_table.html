@@ -1,0 +1,64 @@
+<table class="table sortable table-bordered mx-2 mt-3" id="submissions_table">
+    <tr>
+        <th class="submission_item sort">
+            <a class="no_dec" href="#"><pre class="to_problem mb-0 px-0 py-1 h-100">Submission id</pre></a>
+        </th>
+        <td class="submission_item">
+            <pre class="mb-0 px-0 py-1">Author</pre>
+        </td>
+        <th class="submission_item sort">
+            <a class="no_dec" href="#"><pre class="to_problem mb-0 px-0 py-1 h-100">Problem</pre></a>
+        </th>
+        <th class="submission_item sort">
+            <a class="no_dec" href="#"><pre class="to_problem mb-0 px-0 py-1 h-100">Sending time</pre></a>
+        </th>
+        <th class="submission_item sort">
+            <a class="no_dec" href="#"><pre class="to_problem mb-0 px-0 py-1 h-100">Language</pre></a>
+        </th>
+        <th class="submission_item sort">
+            <a class="no_dec" href="#"><pre class="to_problem mb-0 px-0 py-1 h-100">Status</pre></a>
+        </th>
+        <th class="submission_item sort">
+            <a class="no_dec" href="#"><pre class="to_problem mb-0 px-0 py-1 h-100">Time</pre></a>
+        </th>
+    </tr>
+    {% for submission in submissions %}
+        <tr>
+            <td class="submission_item to_problem">
+                <a class="no_dec" href="/practice/submissions/{{ submission.id }}"><pre class="to_problem mb-0 px-0 py-1 h-100">{{ submission.id }}</pre></a>
+            </td>
+            <td class="submission_item to_problem">
+                <a class="no_dec" href="#"><pre class="to_problem mb-0 px-0 py-1 h-100">{{ submission.user.login }}</pre></a>
+            </td>
+            <td class="submission_item to_problem">
+                <a class="no_dec" href="/practice/basic_programming/problems/{{ submission.problem.id }}"><pre class="to_problem mb-0 px-0 py-1 h-100">{{ submission.problem.title }}</pre></a>
+            </td>
+            <td class="submission_item">
+                <pre class="mb-0 px-0 py-1">{{ ((submission.sending_time)|string).split('.')[0] }}</pre>
+            </td>
+            <td class="submission_item">
+                <pre class="mb-0 px-0 py-1">GNU C++11</pre>
+            </td>
+            {% if submission.status == "AC" %}
+                <td class="submission_item alert-success">
+                    <pre class="mb-0 px-0 py-1">{{ submission.status }}</pre>
+                </td>
+            {% elif "WA" in submission.status %}
+                <td class="submission_item alert-danger">
+                    <pre class="mb-0 px-0 py-1">{{ submission.status }}</pre>
+                </td>
+            {% elif submission.status == "In queue" %}
+                <td class="submission_item alert-secondary">
+                    <pre class="mb-0 px-0 py-1">{{ submission.status }}</pre>
+                </td>
+            {% else %}
+                <td class="submission_item alert-warning">
+                    <pre class="mb-0 px-0 py-1">{{ submission.status }}</pre>
+                </td>
+            {% endif %}
+            <td class="submission_item">
+                <pre class="mb-0 px-0 py-1">{{ (submission.running_time * 1000)|int }} ms</pre>
+            </td>
+        </tr>
+    {% endfor %}
+</table>

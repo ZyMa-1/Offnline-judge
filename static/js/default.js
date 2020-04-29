@@ -1,7 +1,8 @@
 var editor = CodeMirror.fromTextArea(document.getElementById("code_area"), {
 	lineNumbers: true,
 	styleActiveLine: true,
-	matchBrackets: true
+	matchBrackets: true,
+	tabSize: 4,
 });
 editor.setSize(null, 600);
 

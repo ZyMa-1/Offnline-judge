@@ -10,7 +10,9 @@
     <!-- code mirror -->
     <div class="problem_tabs nav-expand-lg">
         <div class="problem_content mx-5 pt-4">
-            <!-- <span onclick="goBack()" class="glyphicon glyphicon-chevron-left">test</span> -->
+            <div class="container">
+                <button onclick="goBack();" class="btn btn-primary go_back">←</button>
+            </div>
             <table class="table table-bordered mx-2 mt-3">
                 <tr>
                     <td class="submission_item">
@@ -36,14 +38,14 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="submission_item ">
-                        <pre class="mb-0 px-0 py-1">{{ submission.id }}</pre>
+                    <td class="submission_item to_problem">
+                        <a class="no_dec" href="/practice/submissions/{{ submission.id }}"><pre class="to_problem mb-0 px-0 py-1 h-100">{{ submission.id }}</pre></a>
                     </td>
-                    <td class="submission_item">
-                        <pre class="mb-0 px-0 py-1">{{ submission.user.login }}</pre>
+                    <td class="submission_item to_problem">
+                        <a class="no_dec" href="#"><pre class="to_problem mb-0 px-0 py-1 h-100">{{ submission.user.login }}</pre></a>
                     </td>
-                    <td class="submission_item">
-                        <pre class="mb-0 px-0 py-1">{{ submission.problem.title }}</pre>
+                    <td class="submission_item to_problem">
+                        <a class="no_dec" href="/practice/basic_programming/problems/{{ submission.problem.id }}"><pre class="to_problem mb-0 px-0 py-1 h-100">{{ submission.problem.title }}</pre></a>
                     </td>
                     <td class="submission_item">
                         <pre class="mb-0 px-0 py-1">{{ ((submission.sending_time)|string).split('.')[0] }}</pre>
@@ -52,17 +54,21 @@
                         <pre class="mb-0 px-0 py-1">GNU C++11</pre>
                     </td>
                     {% if submission.status == "AC" %}
-                    <td class="submission_item alert-success">
-                        <pre class="mb-0 px-0 py-1">{{ submission.status }}</pre>
-                    </td>
+                        <td class="submission_item alert-success">
+                            <pre class="mb-0 px-0 py-1">{{ submission.status }}</pre>
+                        </td>
                     {% elif "WA" in submission.status %}
-                    <td class="submission_item alert-danger">
-                        <pre class="mb-0 px-0 py-1">{{ submission.status }}</pre>
-                    </td>
+                        <td class="submission_item alert-danger">
+                            <pre class="mb-0 px-0 py-1">{{ submission.status }}</pre>
+                        </td>
+                    {% elif submission.status == "In queue" %}
+                        <td class="submission_item alert-secondary">
+                            <pre class="mb-0 px-0 py-1">{{ submission.status }}</pre>
+                        </td>
                     {% else %}
-                    <td class="submission_item alert-warning">
-                        <pre class="mb-0 px-0 py-1">{{ submission.status }}</pre>
-                    </td>
+                        <td class="submission_item alert-warning">
+                            <pre class="mb-0 px-0 py-1">{{ submission.status }}</pre>
+                        </td>
                     {% endif %}
                     <td class="submission_item">
                         <pre class="mb-0 px-0 py-1">{{ (submission.running_time * 1000)|int }} ms</pre>
@@ -71,7 +77,7 @@
             </table>
             <div class="d-flex justify-content-right">
                 <div class="col-md-0 px-0 ml-auto">
-                    <button onclick="copyCode('#code_area')" class="btn btn-outline-dark btn-sm mr-3 mt-1">Copy</button>
+                    <input type="button" value="Copy" id="copy_button" onclick="copyCode(this)" class="btn btn-outline-dark btn-sm mr-3 mt-1"></input>
                 </div>
                 <div class="col-md-2 px-0" style="max-width: 100px;" align="center">
                     <p class="mt-2" align="right">Select theme: </p>

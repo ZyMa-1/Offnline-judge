@@ -3,12 +3,15 @@ import subprocess
 import os
 from time import sleep
 
+import psutil
+
 from data.db_models import db_session
 from data.db_models import users
 from data.db_models import problems
+from data.db_models.problems import Problem
 from data.db_models.submissions import *
 
-import schedule
+from data.db_models.users import User
 
 
 def test_submission(submission, results):
@@ -16,19 +19,32 @@ def test_submission(submission, results):
     problem_path = f'data/problems/{submission.problem_id}/tests'
 
     def delete_temp_files():
+        sleep(1)
         os.remove(f'{submission_path}/submission.exe')
         os.remove(f'{submission_path}/input.txt')
         os.remove(f'{submission_path}/output.txt')
+        # os.remove(f'{submission_path}/err.txt')
 
+    err_file_path = f'{submission_path}/err.txt'
     os.rename(f'{submission_path}/{os.listdir(submission_path)[0]}', f'{submission_path}/submission.cpp')
-    process = os.system(
-        f"g++ -static -fno-strict-aliasing -DACMP -lm -s -x c++ -std=c++14 -Wl,--stack=67108864 -O2 -o {submission_path}/submission.exe {submission_path}/submission.cpp")
-    if process != 0:
-        results[submission.id] = {
-            'status': 'CE',
-            'running_time': 0
-        }
-        return
+    try:
+        subprocess.check_call(
+            f"g++ -static -std=c++14 -o {submission_path}/submission.exe {submission_path}/submission.cpp",
+            stderr=open(err_file_path, 'w'))
+    except subprocess.CalledProcessError:
+        error = open(err_file_path, 'r').read()
+        if "does not name a type" in error or "undefined" in error:
+            results[submission.id] = {
+                'status': 'CE',
+                'running_time': 0
+            }
+            return
+        else:
+            results[submission.id] = {
+                'status': 'MLE 1',
+                'running_time': 0
+            }
+            return
     test_num = 1
     max_running_time = 0
     for filename in os.listdir(f'{problem_path}/input'):
@@ -37,19 +53,36 @@ def test_submission(submission, results):
 
         open(f'{submission_path}/input.txt', 'w').write(input)
         start = datetime.now()
-        subprocess.Popen(f"{submission_path}/submission.exe", stdin=open(f"{submission_path}/input.txt", "r"),
-                         stdout=open(f"{submission_path}/output.txt", "w"))
-        current_running_time = datetime.now() - start
-        seconds = current_running_time.microseconds / 1000000
-        max_running_time = max(max_running_time, seconds)
-        sleep(.1)
-        if max_running_time > submission.problem.time_limit:
+        try:
+            subprocess.check_call(f"{submission_path}/submission.exe",
+                                  stdin=open(f"{submission_path}/input.txt", "r"),
+                                  stdout=open(f"{submission_path}/output.txt", "w"),
+                                  timeout=submission.problem.time_limit)
+            current_running_time = datetime.now() - start
+        except subprocess.TimeoutExpired:
+            sleep(.5)
             results[submission.id] = {
                 'status': f"TLE {test_num}",
                 'running_time': submission.problem.time_limit
             }
             return
-        if open(f"{submission_path}/output.txt", "r").read() != output:
+        sleep(.1)
+        process = psutil.Process(os.getpid())
+        memory = process.memory_info().rss / 1000000
+        if memory > submission.problem.memory_limit:
+            results[submission.id] = {
+                'status': f"MLE {test_num}",
+                'running_time': max_running_time
+            }
+            return
+        seconds = current_running_time.microseconds / 1000000 + current_running_time.seconds
+        if test_num == 1:
+            seconds -= 0.1
+        max_running_time = max(max_running_time, seconds)
+        sleep(.5)
+        submission_output = open(f"{submission_path}/output.txt", "r").read()
+        submission_output = submission_output.strip('\n').strip(' ').rstrip('\n').rstrip(' ')  # delete extra \n
+        if submission_output != output:
             delete_temp_files()
             results[submission.id] = {
                 'status': f"WA {test_num}",
@@ -71,30 +104,16 @@ def test_all_submissions():
     submissions = session.query(Submission).filter(Submission.status == "In queue")
     for submission in submissions:
         test_submission(submission, res)
-    for submission in submissions:
         submission.status = res[submission.id]['status']
         submission.running_time = res[submission.id]['running_time']
-    session.commit()
-    """
-    processes = []
-    for submission in submissions:
-        p = multiprocessing.Process(target=test_submission, args=[submission, results])
-        processes.append(p)
-        p.start()
-
-    for process in processes:
-        process.join()
-    for submission in submissions:
-        submission.status = results[submission.id]['status']
-        submission.running_time = results[submission.id]['running_time']
-    session.commit()
-    print(datetime.now() - start)
-    print(results)
-    """
+        if submission.status == "AC":
+            if submission.problem not in submission.user.problems_solved:
+                submission.user.problems_solved.append(submission.problem)
+        session.commit()
 
 
 def test_forever():
     db_session.global_init("data/db/main.sqlite")
-    schedule.every(1).seconds.do(test_all_submissions)
     while 1:
-        schedule.run_pending()
+        test_all_submissions()
+        sleep(1)

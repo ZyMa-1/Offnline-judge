@@ -22,13 +22,6 @@ body {
 .sign_up_form{
     max-width: 600px;
 }
-.solve_indicator{
-    height: 25px;
-    width: 25px;
-    background-color: #bbb;
-    border-radius: 50%;
-    display: inline-block;
-}
 hr.solid_sep{
     margin-top: 1rem;
     margin-bottom: 1rem;
@@ -43,9 +36,17 @@ span.solve_indicator{
     margin-left: 0.2rem;
     height: 15px;
     width: 15px;
-    background-color: #bbb;
     border-radius: 50%;
     display: inline-block;
+}
+span.gray_indicator{
+    background-color: #bbb;
+}
+span.success_indicator{
+    background-color: rgb(85, 194, 5);
+}
+span.danger_indicator{
+    background-color: rgb(182, 0, 22);
 }
 .problem_container{
     max-height: 40px;
@@ -128,8 +129,17 @@ td.submission_item{
     padding-top: 0.1rem;
     padding-bottom: 0.1rem;
 }
+th.submission_item{
+    text-align: center;
+    padding: 0;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+}
 td.to_problem:hover{
     background-color: rgb(205, 235, 255);
+}
+th.sort:hover{
+    background-color: rgb(240, 245, 240);
 }
 pre.to_problem{
     text-decoration: none;
@@ -140,4 +150,11 @@ pre.to_problem:hover{
 }
 a.no_dec{
     text-decoration: None
+}
+button.go_back{
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 0px;
+    padding-bottom: 1px;
+    font-size: 17px;
 }

@@ -4,6 +4,7 @@ var editor = CodeMirror.fromTextArea(document.getElementById("code_area"), {
 	matchBrackets: true,
 	readOnly: true,
 	showCursorWhenSelecting: false,
+	tabSize: 4,
 });
 editor.setSize(null, 600);
 
@@ -14,12 +15,12 @@ function selectTheme() {
 	editor.setOption("theme", theme);
 }
 function copyCode(element) {
-  var $temp = $("<input>");
-  $("body").append($temp);
-  $temp.val($(element).text()).select();
-  document.execCommand("copy");
-  $temp.remove();
-}
-function goBack() {
-  window.history.back();
+    var $temp = $("<textarea>");
+    $("body").append($temp);
+    $temp.val($(element).text()).select();
+    document.execCommand("copy");
+    $temp.remove();
+    document.getElementById('copy_button').value = "Copied";
+    $(element).toggleClass('btn-outline-dark');
+    $(element).toggleClass('btn-dark');
 }

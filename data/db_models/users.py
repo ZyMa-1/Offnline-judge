@@ -16,7 +16,9 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     hashed_password = sqlalchemy.Column(sqlalchemy.String)
     icon_id = sqlalchemy.Column(sqlalchemy.String)  # relative path to icon
     submissions = orm.relation("Submission", back_populates='user')  # list of submissions(one-to-many)
-    solved_problems = sqlalchemy.Column(sqlalchemy.String)  # 1, 2, 3,..
+    problems_solved = orm.relation("Problem",
+                                   secondary="users_to_problems",
+                                   backref="users_solved", lazy='subquery')  # many-to-many
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)

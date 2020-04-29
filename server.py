@@ -54,8 +54,8 @@ def after_request(response):
     return response
 
 
-def remove_cache():
-    response = make_response(url_for('sign_up'))
+def remove_cache(page_url):
+    response = make_response(url_for(page_url))
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-cache'
 
@@ -173,22 +173,44 @@ def practice():
     return render_template('practice.html', **params)
 
 
-@app.route('/practice/basic_programming', methods=['GET', 'POST'])
+@app.route('/practice/basic_programming', methods=['GET'])
 def basic_programming():
     session = db_session.create_session()
     params = base_params("Basic Programming", 1)
-    params["problems"] = session.query(Problem).all()
+    params["problems"] = session.query(Problem).filter(Problem.theme == "basic_programming")
+    if current_user.is_authenticated:
+        params["problems_id"] = [problem.id for problem in current_user.problems_solved]
+        params["try_problems_id"] = set([submission.problem.id for submission in current_user.submissions])
+    else:
+        params["problems_id"] = []
+        params["try_problems_id"] = set()
     return render_template('basic_programming.html', **params)
+
+
+@app.route('/practice/data_structures', methods=['GET'])
+def data_structures():
+    session = db_session.create_session()
+    params = base_params("Data Structures", 1)
+    params["problems"] = session.query(Problem).filter(Problem.theme == "data_structures")
+    if current_user.is_authenticated:
+        params["problems_id"] = [problem.id for problem in current_user.problems_solved]
+        params["try_problems_id"] = set([submission.problem.id for submission in current_user.submissions])
+    else:
+        params["problems_id"] = []
+        params["try_problems_id"] = set()
+    return render_template('data_structures.html', **params)
 
 
 @app.route('/practice/basic_programming/problems/<int:problem_id>', methods=['GET', 'POST'])
 def basic_programming_problem(problem_id):
     session = db_session.create_session()
     form = SubmitForm()
-    params = base_params("Basic Programming", 1)
+    params = base_params("Fak me", 1)
     params["statement"] = f"problems/{problem_id}/statement.html"
-    params["problem"] = session.query(Problem).filter(Problem.id == problem_id).first()
+    params["problem"] = session.query(Problem).filter(Problem.id == problem_id and Problem.theme == "basic_programming").first()
+    params["title"] = params["problem"].title
     params["form"] = form
+    params["goBack_href"] = "/practice/basic_programming"
     if form.validate_on_submit():
         code = request.form["code_area"]
         if code == "":
@@ -206,6 +228,7 @@ def basic_programming_problem(problem_id):
             user_id=current_user.id,
             problem_id=problem_id,
             status="In queue",
+            running_time=0,
         )
         session.add(submission)
         session.commit()
@@ -220,7 +243,7 @@ def basic_programming_my_submissions(problem_id):
     session = db_session.create_session()
     submissions = session.query(Submission).filter(Submission.user_id == current_user.id).order_by(
         Submission.sending_time.desc())
-    params = base_params("Basic Programming", 1)
+    params = base_params("My submissions", 1)
     params["statement"] = f"problems/{problem_id}/statement.html"
     params["submissions"] = submissions
     params["problem"] = session.query(Problem).filter(Problem.id == problem_id).first()
@@ -231,7 +254,7 @@ def basic_programming_my_submissions(problem_id):
 @login_required
 def submission(submission_id):
     session = db_session.create_session()
-    params = base_params("Basic Programming", 1)
+    params = base_params("Submission", 1)
     params["code"] = open(f"data/testing_system/submissions/{submission_id}/submission.cpp", "r").read()
     params["submission"] = session.query(Submission).filter(Submission.id == submission_id).first()
     return render_template('submission.html', **params)
