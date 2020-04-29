@@ -45,7 +45,7 @@
                         <a class="no_dec" href="#"><pre class="to_problem mb-0 px-0 py-1 h-100">{{ submission.user.login }}</pre></a>
                     </td>
                     <td class="submission_item to_problem">
-                        <a class="no_dec" href="/practice/basic_programming/problems/{{ submission.problem.id }}"><pre class="to_problem mb-0 px-0 py-1 h-100">{{ submission.problem.title }}</pre></a>
+                        <a class="no_dec" href="/practice/{{ submission.problem.theme }}/problems/{{ submission.problem.id }}"><pre class="to_problem mb-0 px-0 py-1 h-100">{{ submission.problem.title }}</pre></a>
                     </td>
                     <td class="submission_item">
                         <pre class="mb-0 px-0 py-1">{{ ((submission.sending_time)|string).split('.')[0] }}</pre>

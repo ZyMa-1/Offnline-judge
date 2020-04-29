@@ -173,44 +173,35 @@ def practice():
     return render_template('practice.html', **params)
 
 
-@app.route('/practice/basic_programming', methods=['GET'])
-def basic_programming():
+@app.route('/practice/<string:theme>', methods=['GET'])
+def basic_programming(theme):
+    def theme_to_pretty_theme():
+        pretty_theme = theme.split('_')
+        pretty_theme = ' '.join([it[0].upper() + it[1:].lower() for it in pretty_theme])
+        return pretty_theme
     session = db_session.create_session()
-    params = base_params("Basic Programming", 1)
-    params["problems"] = session.query(Problem).filter(Problem.theme == "basic_programming")
+    params = base_params(theme, 1)
+    params["problems"] = session.query(Problem).filter(Problem.theme == theme)
+    params["theme_title"] = theme_to_pretty_theme()
     if current_user.is_authenticated:
         params["problems_id"] = [problem.id for problem in current_user.problems_solved]
         params["try_problems_id"] = set([submission.problem.id for submission in current_user.submissions])
     else:
         params["problems_id"] = []
         params["try_problems_id"] = set()
-    return render_template('basic_programming.html', **params)
+    return render_template('problems_list.html', **params)
 
 
-@app.route('/practice/data_structures', methods=['GET'])
-def data_structures():
-    session = db_session.create_session()
-    params = base_params("Data Structures", 1)
-    params["problems"] = session.query(Problem).filter(Problem.theme == "data_structures")
-    if current_user.is_authenticated:
-        params["problems_id"] = [problem.id for problem in current_user.problems_solved]
-        params["try_problems_id"] = set([submission.problem.id for submission in current_user.submissions])
-    else:
-        params["problems_id"] = []
-        params["try_problems_id"] = set()
-    return render_template('data_structures.html', **params)
-
-
-@app.route('/practice/basic_programming/problems/<int:problem_id>', methods=['GET', 'POST'])
-def basic_programming_problem(problem_id):
+@app.route('/practice/<string:theme>/problems/<int:problem_id>', methods=['GET', 'POST'])
+def basic_programming_problem(theme, problem_id):
     session = db_session.create_session()
     form = SubmitForm()
     params = base_params("Fak me", 1)
     params["statement"] = f"problems/{problem_id}/statement.html"
-    params["problem"] = session.query(Problem).filter(Problem.id == problem_id and Problem.theme == "basic_programming").first()
+    params["problem"] = session.query(Problem).filter(Problem.id == problem_id, Problem.theme == theme).first()
     params["title"] = params["problem"].title
     params["form"] = form
-    params["goBack_href"] = "/practice/basic_programming"
+    params["goBack_href"] = f"/practice/{params['problem'].theme}"
     if form.validate_on_submit():
         code = request.form["code_area"]
         if code == "":
@@ -237,12 +228,13 @@ def basic_programming_problem(problem_id):
     return render_template('problem.html', **params)
 
 
-@app.route('/practice/basic_programming/problems/<int:problem_id>/my_submissions', methods=['GET'])
+@app.route('/practice/<string:theme>/problems/<int:problem_id>/my_submissions', methods=['GET'])
 @login_required
-def basic_programming_my_submissions(problem_id):
+def basic_programming_my_submissions(theme, problem_id):
     session = db_session.create_session()
     submissions = session.query(Submission).filter(Submission.user_id == current_user.id).order_by(
         Submission.sending_time.desc())
+    submissions = list(filter(lambda it: it.problem.theme == theme, submissions))
     params = base_params("My submissions", 1)
     params["statement"] = f"problems/{problem_id}/statement.html"
     params["submissions"] = submissions
