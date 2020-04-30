@@ -71,7 +71,7 @@ def base_params(title, navbar_active_tab_id):
         "navbar_active_tab_id": navbar_active_tab_id,
     }
     if current_user.is_authenticated:
-        params["user_icon"] = url_for("static", filename=f"user_data/icons/{current_user.icon_id}.png")
+        params["user_icon"] = url_for("static", filename=f"user_data/icons/small/{current_user.icon_id}.png")
     return params
 
 
@@ -85,9 +85,9 @@ def home():
 def sign_up():
     icon_folder_path = "static/user_data/icons"
 
-    def resize_image(path):
+    def resize_image(path, w, h):
         image = Image.open(path)
-        image = image.resize((40, 40))
+        image = image.resize((w, h))
         image.save(path)
 
     def generate_icon_name():
@@ -100,17 +100,24 @@ def sign_up():
 
     def save_custom_user_icon(icon_data):
         icon_id, icon_name = generate_icon_name()
-        path = f"{icon_folder_path}/{icon_name}"
-        open(path, 'wb').write(icon_data)
-        resize_image(path)
+        path_small = f"{icon_folder_path}/small/{icon_name}"
+        path_large = f"{icon_folder_path}/large/{icon_name}"
+        open(path_small, 'wb').write(icon_data)
+        open(path_large, 'wb').write(icon_data)
+        resize_image(path_small, 40, 40)
+        resize_image(path_large, 200, 200)
         return icon_id
 
     def save_default_user_icon():
         num = randint(1, 3)  # 1-number of default icons
         icon_id, icon_name = generate_icon_name()
-        path = f"{icon_folder_path}/{icon_name}"
-        open(path, 'wb').write(open(f"data/default/user_icons/user_icon_{num}.png", "rb").read())
-        resize_image(path)
+        path_small = f"{icon_folder_path}/small/{icon_name}"
+        path_large = f"{icon_folder_path}/large/{icon_name}"
+        icon_data = open(f"data/default/user_icons/user_icon_{num}.png", "rb").read()
+        open(path_small, 'wb').write(icon_data)
+        open(path_large, 'wb').write(icon_data)
+        resize_image(path_small, 40, 40)
+        resize_image(path_large, 200, 200)
         return icon_id
 
     form = SignUpForm()
@@ -212,7 +219,9 @@ def problem(theme, problem_id):
         if not current_user.is_authenticated:
             params["message"] = "You must sign in to submit code"
             return render_template('problem.html', **params)
-        submission_id = session.query(sqlalchemy_func.max(Submission.id)).one()[0] + 1
+        submission_id = 1
+        if session.query(Submission).first():
+            submission_id = session.query(sqlalchemy_func.max(Submission.id)).one()[0] + 1
         submission_folder = f'data/testing_system/submissions/{submission_id}'
         os.mkdir(f'data/testing_system/submissions/{submission_id}')
         open(f"{submission_folder}/solution.cpp", "w").writelines([line.rstrip('\n') for line in code])
@@ -240,7 +249,7 @@ def my_submissions(theme, problem_id):
     params = base_params("My submissions", 1)
     params["statement"] = f"problems/{problem_id}/statement.html"
     params["submissions"] = submissions
-    params["problem"] = session.query(Problem).filter(Problem.id == problem_id).first()
+    params["problem"] = session.query(Problem).get(problem_id)
     params["active_tab_id"] = 2
     return render_template('my_submissions.html', **params)
 
@@ -251,7 +260,7 @@ def submission(submission_id):
     session = db_session.create_session()
     params = base_params("Submission", 1)
     params["code"] = open(f"data/testing_system/submissions/{submission_id}/submission.cpp", "r").read()
-    params["submission"] = session.query(Submission).filter(Submission.id == submission_id).first()
+    params["submission"] = session.query(Submission).get(submission_id)
     return render_template('submission.html', **params)
 
 
@@ -262,7 +271,7 @@ def editorial(theme, problem_id):
     params["editorial"] = f"problems/{problem_id}/editorial.html"
     params["active_tab_id"] = 1
     params["code"] = open(f"templates/problems/{problem_id}/author_solution.cpp", "r").read()
-    params["problem"] = session.query(Problem).filter(Problem.id == problem_id).first()
+    params["problem"] = session.query(Problem).get(problem_id)
     return render_template('editorial.html', **params)
 
 
@@ -272,6 +281,14 @@ def submissions():
     params = base_params("Submissions", 2)
     params["submissions"] = session.query(Submission).order_by(Submission.id.desc()).limit(20).all()
     return render_template('submissions.html', **params)
+
+
+@app.route('/profile/<int:user_id>', methods=['GET'])
+def profile(user_id):
+    session = db_session.create_session()
+    params = base_params("Profile", -1)
+    params["user"] = session.query(User).get(user_id)
+    return render_template('profile.html', **params)
 
 
 if __name__ == '__main__':
