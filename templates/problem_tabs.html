@@ -1,0 +1,25 @@
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        {% if active_tab_id == 0 %}
+            <a class="nav-link active" href="/practice/{{ problem.theme }}/problems/{{ problem.id }}">Problem Statement</a>
+        {% else %}
+            <a class="nav-link" href="/practice/{{ problem.theme }}/problems/{{ problem.id }}">Problem Statement</a>
+        {% endif %}
+    </li>
+    <li class="nav-item">
+        {% if active_tab_id == 1 %}
+            <a class="nav-link active" href="/practice/{{ problem.theme }}/problems/{{ problem.id }}/editorial">Editorial</a>
+        {% else %}
+            <a class="nav-link" href="/practice/{{ problem.theme }}/problems/{{ problem.id }}/editorial">Editorial</a>
+        {% endif %}
+    </li>
+    {% if current_user.is_authenticated %}
+        <li class="nav-item">
+            {% if active_tab_id == 2 %}
+                <a class="nav-link active" href="/practice/{{ problem.theme }}/problems/{{ problem.id }}/my_submissions">My submissions</a>
+            {% else %}
+                <a class="nav-link" href="/practice/{{ problem.theme }}/problems/{{ problem.id }}/my_submissions">My submissions</a>
+            {% endif %}
+        </li>
+    {% endif %}
+</ul>

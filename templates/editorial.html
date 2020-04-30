@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="problem_tabs nav-expand-lg">
+    <!-- code mirror -->
+    <link rel="stylesheet" type="text/css" href="/static/plugin/codemirror/lib/codemirror.css">
+    <script src="/static/plugin/codemirror/lib/codemirror.js"></script>
+    <script src="/static/plugin/codemirror/mode/javascript/javascript.js"></script>
+    <script src="/static/plugin/codemirror/mode/css/css.js"></script>
+    <link rel="stylesheet" href="/static/plugin/codemirror/theme/darcula.css">
+    <!-- code mirror -->
+    {% include "problem_tabs.html" %}
+    <div class="problem_content mx-5 pt-4">
+        {% include editorial %}
+        <br><br>
+        <div class="contiiner">
+            <button onclick="refreshCode()" class="btn btn-primary" type="button" data-toggle="collapse" data-target="#code_area_div" aria-expanded="false" aria-controls="code_area_div">
+                Author's solution
+            </button>
+        </div>
+        <br>
+        <div class="collapse" id="code_area_div">
+            <div class="d-flex justify-content-right">
+                <div class="col-md-2 px-0 ml-auto" style="max-width: 100px;" align="center">
+                    <p class="mt-2" align="right">Select theme: </p>
+                </div>
+                <div class="col-md-2">
+                    <select id="theme_select" class="form-control" align="right" onchange="selectTheme()">
+                        <option selected value="0">default</option>
+                        <option value="1">darcula</option>
+                    </select>
+                </div>
+            </div>
+            <div class="container">
+                <textarea id="code_area" name="code_area">{{ code }}</textarea>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/sorttable.js"></script>
+    <!-- editor_theme_change(and other stuff) -->
+    <script type="text/javascript" src="/static/js/default.js"></script>
+</div>
+{% endblock %}

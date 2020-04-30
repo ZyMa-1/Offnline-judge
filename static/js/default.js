@@ -12,6 +12,9 @@ function selectTheme() {
 	var theme = theme_select.options[theme_select.selectedIndex].innerHTML;
 	editor.setOption("theme", theme);
 }
+function refreshCode() {
+    editor.setOption("theme", "darcula");
+}
 window.setTimeout(function() {
     $(".alert").fadeTo(500, 0).slideUp(500, function(){
         $(this).remove();
