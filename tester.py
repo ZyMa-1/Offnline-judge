@@ -23,7 +23,7 @@ def test_submission(submission, results):
         os.remove(f'{submission_path}/submission.exe')
         os.remove(f'{submission_path}/input.txt')
         os.remove(f'{submission_path}/output.txt')
-        # os.remove(f'{submission_path}/err.txt')
+        os.remove(f'{submission_path}/err.txt')
 
     err_file_path = f'{submission_path}/err.txt'
     os.rename(f'{submission_path}/{os.listdir(submission_path)[0]}', f'{submission_path}/submission.cpp')
@@ -38,13 +38,12 @@ def test_submission(submission, results):
                 'status': 'CE',
                 'running_time': 0
             }
-            return
         else:
             results[submission.id] = {
                 'status': 'MLE 1',
                 'running_time': 0
             }
-            return
+        return delete_temp_files()
     test_num = 1
     max_running_time = 0
     for filename in os.listdir(f'{problem_path}/input'):
@@ -65,16 +64,17 @@ def test_submission(submission, results):
                 'status': f"TLE {test_num}",
                 'running_time': submission.problem.time_limit
             }
-            return
+            return delete_temp_files()
         sleep(.1)
         process = psutil.Process(os.getpid())
         memory = process.memory_info().rss / 1000000
+        print(memory)
         if memory > submission.problem.memory_limit:
             results[submission.id] = {
                 'status': f"MLE {test_num}",
                 'running_time': max_running_time
             }
-            return
+            return delete_temp_files()
         seconds = current_running_time.microseconds / 1000000 + current_running_time.seconds
         if test_num == 1:
             seconds -= 0.1
@@ -83,19 +83,17 @@ def test_submission(submission, results):
         submission_output = open(f"{submission_path}/output.txt", "r").read()
         submission_output = submission_output.strip('\n').strip(' ').rstrip('\n').rstrip(' ')  # delete extra \n
         if submission_output != output:
-            delete_temp_files()
             results[submission.id] = {
                 'status': f"WA {test_num}",
                 'running_time': max_running_time
             }
-            return
+            return delete_temp_files()
         test_num += 1
-    delete_temp_files()
     results[submission.id] = {
         'running_time': max_running_time,
         'status': 'AC'
     }
-    return
+    return delete_temp_files()
 
 
 def test_all_submissions():

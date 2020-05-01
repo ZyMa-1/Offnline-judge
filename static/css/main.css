@@ -158,3 +158,12 @@ button.go_back{
     padding-bottom: 1px;
     font-size: 17px;
 }
+img.profile_icon{
+    border-top: 3px solid #ddd;
+    border-radius: 5%;
+    box-shadow: 0 0 0 7px #fff,
+                0 0 0 8px #ddd;
+}
+div.adj{
+    display: inline-block;
+}

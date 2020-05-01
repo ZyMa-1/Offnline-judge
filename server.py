@@ -72,6 +72,7 @@ def base_params(title, navbar_active_tab_id):
     }
     if current_user.is_authenticated:
         params["user_icon"] = url_for("static", filename=f"user_data/icons/small/{current_user.icon_id}.png")
+        params["profile_url"] = f"/profile/{current_user.id}"
     return params
 
 
@@ -241,7 +242,7 @@ def problem(theme, problem_id):
 
 @app.route('/practice/<string:theme>/problems/<int:problem_id>/my_submissions', methods=['GET'])
 @login_required
-def my_submissions(theme, problem_id):
+def my_submissions_on_problem(theme, problem_id):
     session = db_session.create_session()
     submissions = session.query(Submission).filter(Submission.user_id == current_user.id).order_by(
         Submission.sending_time.desc())
@@ -251,7 +252,7 @@ def my_submissions(theme, problem_id):
     params["submissions"] = submissions
     params["problem"] = session.query(Problem).get(problem_id)
     params["active_tab_id"] = 2
-    return render_template('my_submissions.html', **params)
+    return render_template('my_submissions_on_problem.html', **params)
 
 
 @app.route('/practice/submissions/<int:submission_id>', methods=['GET'])
@@ -283,11 +284,63 @@ def submissions():
     return render_template('submissions.html', **params)
 
 
+@app.route('/my_submissions', methods=['GET'])
+@login_required
+def my_submissions():
+    session = db_session.create_session()
+    submissions = session.query(Submission).filter(Submission.user_id == current_user.id).order_by(
+        Submission.sending_time.desc())
+    params = base_params("My submissions", -1)
+    params["submissions"] = submissions
+    return render_template('my_submissions.html', **params)
+
+
 @app.route('/profile/<int:user_id>', methods=['GET'])
 def profile(user_id):
+    def parse_user_statistics(submissions):
+        submissions_results = {
+            "AC": 0,
+            "WA": 0,
+            "TLE": 0,
+            "MLE": 0,
+            "CE": 0,
+            "RE": 0
+        }
+        ans_dict = {
+            "AC": 0,
+            "WA": 0,
+            "TLE": 0,
+            "MLE": 0,
+            "CE": 0,
+            "RE": 0,
+            "accuracy": 0,
+            "problems_solved": 0,
+            "languages": ["C++11"],
+            "skills": ["soon..."]
+        }
+        submissions_num = 0
+        for submission in submissions:
+            for key in submissions_results.keys():
+                if key in submission.status:
+                    ans_dict[key] += 1
+                    break
+            submissions_num += 1
+        if submissions_num == 0:
+            ans_dict["accuracy"] = 100
+            return ans_dict
+        ac_submissions_num = len(list(filter(lambda it: it.status == "AC", submissions)))
+        params["accuracy"] = round(ac_submissions_num / submissions_num, 2)
+        params["problems_solved"] = ac_submissions_num
+        return ans_dict
+
     session = db_session.create_session()
     params = base_params("Profile", -1)
     params["user"] = session.query(User).get(user_id)
+    params["submissions"] = session.query(Submission).filter(Submission.user_id == user_id)
+    params["user_statistics"] = parse_user_statistics(params["submissions"])
+    params["profile_icon"] = f"/static/user_data/icons/large/{params['user'].icon_id}.png"
+    params["table_headers"] = ["AC", "CE", "WA", "TLE", "MLE", "RE"]
+
     return render_template('profile.html', **params)
 
 

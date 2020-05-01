@@ -1,7 +1,44 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="profile_container">
-    <img class="profile_icon" src="{{ profile_icon }}">
+<div class="problem_tabs nav-expand-lg px-3">
+    <div class="problem_content mx-5 pt-4">
+        <div class="row">
+            <div class="col-sm-3">
+                <img class="profile_icon" src="{{ profile_icon }}">
+                <div class="adj mt-4" style="width: 200px">
+                    <h4 align="center">{{ user.login }}</h4>
+                </div>
+            </div>
+            <div class="col-md-5 pl-0">
+                <p class="mr-1 h5">User statistics:</p>
+                    <div class="adj pl-2">
+                    <p class="mt-1">Problems solved: {{ user_statistics["problems_solved"] }}</p>
+                    <p class="mt-1">Accuracy: {{ user_statistics["accuracy"] }}%</p>
+                    <p class="mt-1">Languages: {% for language in  user_statistics["languages"] %}{{ language }}{% endfor %}</p>
+                </div>
+            </div>
+            <div class="col">
+                <table class="table table-bordered w-50 ml-auto">
+                    <tr>
+                        <th class="py-2">Result</th>
+                        <th class="py-2 w-25">Number</th>
+                    </tr>
+                    {% for header in table_headers %}
+                        <tr>
+                            {% if "AC" in header %}
+                                <td class="text-success py-2"><b>{{ header }}</b></td>
+                            {% elif "CE" in header %}
+                                <td class="text-warning py-2"><b>{{ header }}</b></td>
+                            {% else %}
+                                <td class="text-danger py-2"><b>{{ header }}</b></td>
+                            {% endif %}
+                            <td class="py-2">{{ user_statistics[header] }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
