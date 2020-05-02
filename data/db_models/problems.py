@@ -2,7 +2,13 @@ import sqlalchemy
 from sqlalchemy_serializer import SerializerMixin
 from .db_session import SqlAlchemyBase
 
-users_to_problems = sqlalchemy.Table('users_to_problems', SqlAlchemyBase.metadata,
+users_to_solved_problems = sqlalchemy.Table('users_to_solved_problems', SqlAlchemyBase.metadata,
+                                     sqlalchemy.Column('users', sqlalchemy.Integer,
+                                                       sqlalchemy.ForeignKey('users.id')),
+                                     sqlalchemy.Column('problems', sqlalchemy.Integer,
+                                                       sqlalchemy.ForeignKey('problems.id'))
+                                     )
+users_to_unsolved_problems = sqlalchemy.Table('users_to_unsolved_problems', SqlAlchemyBase.metadata,
                                      sqlalchemy.Column('users', sqlalchemy.Integer,
                                                        sqlalchemy.ForeignKey('users.id')),
                                      sqlalchemy.Column('problems', sqlalchemy.Integer,

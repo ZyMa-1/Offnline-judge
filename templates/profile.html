@@ -12,10 +12,34 @@
             </div>
             <div class="col-md-5 pl-0">
                 <p class="mr-1 h5">User statistics:</p>
-                    <div class="adj pl-2">
+                <div class="adj pl-2">
                     <p class="mt-1">Problems solved: {{ user_statistics["problems_solved"] }}</p>
                     <p class="mt-1">Accuracy: {{ user_statistics["accuracy"] }}%</p>
                     <p class="mt-1">Languages: {% for language in  user_statistics["languages"] %}{{ language }}{% endfor %}</p>
+                </div>
+                <div class="container ml-0 pl-2 w-50">
+                    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#solved_problems">Solved problems</button>
+                    <div id="solved_problems" class="collapse col py-2 px-0 ">
+                        <div class="card card-body py-2 px-3">
+                            <p class="m-0">
+                                {% for problem in user.problems_solved %}
+                                    <a href="/practice/{{ problem.theme }}/problems/{{ problem.id }}">{{ problem.title }}</a>
+                                    {% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-info my-2" data-toggle="collapse" data-target="#unsolved_problems">Unsolved problems</button>
+                    <div id="unsolved_problems" class="collapse py-2">
+                        <div class="card card-body py-2 px-3">
+                            <p class="m-0">
+                                {% for problem in user.problems_unsolved %}
+                                    <a href="/practice/{{ problem.theme }}/problems/{{ problem.id }}">{{ problem.title }}</a>
+                                    {% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col">

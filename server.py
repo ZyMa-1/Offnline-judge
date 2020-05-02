@@ -193,11 +193,11 @@ def problem_list(theme):
     params["problems"] = session.query(Problem).filter(Problem.theme == theme)
     params["theme_title"] = theme_prettify()
     if current_user.is_authenticated:
-        params["problems_id"] = [problem.id for problem in current_user.problems_solved]
-        params["try_problems_id"] = set([submission.problem.id for submission in current_user.submissions])
+        params["problems_solved_id"] = [problem.id for problem in current_user.problems_solved]
+        params["problems_unsolved_id"] = [problem.id for problem in current_user.problems_unsolved]
     else:
-        params["problems_id"] = []
-        params["try_problems_id"] = set()
+        params["problems_solved_id"] = []
+        params["problems_unsolved_id"] = set()
     return render_template('problems_list.html', **params)
 
 
@@ -297,7 +297,7 @@ def my_submissions():
 
 @app.route('/profile/<int:user_id>', methods=['GET'])
 def profile(user_id):
-    def parse_user_statistics(submissions):
+    def parse_user_statistics(user):
         submissions_results = {
             "AC": 0,
             "WA": 0,
@@ -319,7 +319,7 @@ def profile(user_id):
             "skills": ["soon..."]
         }
         submissions_num = 0
-        for submission in submissions:
+        for submission in user.submissions:
             for key in submissions_results.keys():
                 if key in submission.status:
                     ans_dict[key] += 1
@@ -328,16 +328,13 @@ def profile(user_id):
         if submissions_num == 0:
             ans_dict["accuracy"] = 100
             return ans_dict
-        ac_submissions_num = len(list(filter(lambda it: it.status == "AC", submissions)))
-        params["accuracy"] = round(ac_submissions_num / submissions_num, 2)
-        params["problems_solved"] = ac_submissions_num
+        ans_dict["accuracy"] = int(round(len(user.problems_solved) / submissions_num, 2) * 100)
         return ans_dict
 
     session = db_session.create_session()
     params = base_params("Profile", -1)
     params["user"] = session.query(User).get(user_id)
-    params["submissions"] = session.query(Submission).filter(Submission.user_id == user_id)
-    params["user_statistics"] = parse_user_statistics(params["submissions"])
+    params["user_statistics"] = parse_user_statistics(params["user"])
     params["profile_icon"] = f"/static/user_data/icons/large/{params['user'].icon_id}.png"
     params["table_headers"] = ["AC", "CE", "WA", "TLE", "MLE", "RE"]
 

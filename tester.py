@@ -20,10 +20,22 @@ def test_submission(submission, results):
 
     def delete_temp_files():
         sleep(1)
-        os.remove(f'{submission_path}/submission.exe')
-        os.remove(f'{submission_path}/input.txt')
-        os.remove(f'{submission_path}/output.txt')
-        os.remove(f'{submission_path}/err.txt')
+        try:
+            os.remove(f'{submission_path}/submission.exe')
+        except Exception:
+            pass
+        try:
+            os.remove(f'{submission_path}/input.txt')
+        except Exception:
+            pass
+        try:
+            os.remove(f'{submission_path}/output.txt')
+        except Exception:
+            pass
+        try:
+            os.remove(f'{submission_path}/err.txt')
+        except Exception:
+            pass
 
     err_file_path = f'{submission_path}/err.txt'
     os.rename(f'{submission_path}/{os.listdir(submission_path)[0]}', f'{submission_path}/submission.cpp')
@@ -53,10 +65,11 @@ def test_submission(submission, results):
         open(f'{submission_path}/input.txt', 'w').write(input)
         start = datetime.now()
         try:
-            subprocess.check_call(f"{submission_path}/submission.exe",
-                                  stdin=open(f"{submission_path}/input.txt", "r"),
-                                  stdout=open(f"{submission_path}/output.txt", "w"),
-                                  timeout=submission.problem.time_limit)
+            subprocess.check_call(
+                f"{submission_path}/submission.exe",
+                stdin=open(f"{submission_path}/input.txt", "r"),
+                stdout=open(f"{submission_path}/output.txt", "w"),
+                timeout=submission.problem.time_limit)
             current_running_time = datetime.now() - start
         except subprocess.TimeoutExpired:
             sleep(.5)
@@ -66,10 +79,7 @@ def test_submission(submission, results):
             }
             return delete_temp_files()
         sleep(.1)
-        process = psutil.Process(os.getpid())
-        memory = process.memory_info().rss / 1000000
-        print(memory)
-        if memory > submission.problem.memory_limit:
+        if -1 > submission.problem.memory_limit:
             results[submission.id] = {
                 'status': f"MLE {test_num}",
                 'running_time': max_running_time
@@ -105,8 +115,13 @@ def test_all_submissions():
         submission.status = res[submission.id]['status']
         submission.running_time = res[submission.id]['running_time']
         if submission.status == "AC":
+            if submission.problem in submission.user.problems_unsolved:
+                submission.user.problems_unsolved.remove(submission.problem)
             if submission.problem not in submission.user.problems_solved:
                 submission.user.problems_solved.append(submission.problem)
+        else:
+            if submission.problem not in submission.user.problems_unsolved:
+                submission.user.problems_unsolved.append(submission.problem)
         session.commit()
 
 

@@ -10,9 +10,9 @@
             <div class="row">
                 <div class="col">
                     <div class="problem_container row float-left center-block mx-auto">
-                        {% if (current_user.is_authenticated) and (problem.id in problems_id) %}
+                        {% if (current_user.is_authenticated) and (problem.id in problems_solved_id) %}
                             <span class="solve_indicator success_indicator"></span>
-                        {% elif (current_user.is_authenticated) and (problem.id in try_problems_id) %}
+                        {% elif (current_user.is_authenticated) and (problem.id in problems_unsolved_id) %}
                             <span class="solve_indicator danger_indicator"></span>
                         {% else %}
                             <span class="solve_indicator gray_indicator"></span>
