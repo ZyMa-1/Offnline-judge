@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="problem_tabs nav-expand-lg px-3">
+    <div class="problem_content mx-5 pt-4">
+        <div class="row">
+            <div class="col-sm-3 profile_icon_box">
+                <img class="profile_icon" src="{{ profile_icon }}">
+                <form action="" method="post" id="icon_change" name="icon_change" enctype="multipart/form-data">
+                    {{ icon_change_form.hidden_tag() }}
+                    {{ icon_change_form.csrf_token }}
+                    <div class="adj small_font">
+                        {{ icon_change_form.icon.label }}<br>
+                        {{ icon_change_form.icon(class="form-control-file pl-3", type="file") }}
+                        {% if icon_change_form_visible_errors %}
+                            {% for error in icon_change_form.icon.errors %}
+                                <p class="alert alert-danger mt-2 pl-3 small p-1" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <p class="mt-2" align="center">{{ icon_change_form.submit(type="submit", class="btn btn-primary btn-sm small_font", form="icon_change") }}</p>
+                </form>
+                <hr class="m-0">
+                <div class="adj mt-2" style="width: 200px;">
+                    <a class="no_dec" href="/profile/{{ current_user.id }}"><h4 align="center">{{ current_user.login }}</h4></a>
+                </div>
+            </div>
+            <div class="col-md-7 pl-0 border ml-2">
+                <form class="base_form mt-4" action="" method="post" id="email_change" name="email_change">
+                    {{ email_change_form.hidden_tag() }}
+                    {{ email_change_form.csrf_token }}
+                    <p>
+                        {{ email_change_form.email.label }}
+                        {{ email_change_form.email(class="form-control", type="email") }}
+                        {% if email_change_form_visible_errors %}
+                            {% for error in email_change_form.email.errors %}
+                                <p class="alert alert-danger mt-2" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        {% endif %}
+                        <p class="text-danger">{{ email_error_message }}</p>
+                    </p>
+                    <p class="ml-2">{{ email_change_form.submit(type="submit", class="btn btn-primary", form="email_change") }}</p>
+                </form>
+                <form class="base_form mt-4" action="" method="post" id="password_change" name="password_change">
+                    {{ password_change_form.hidden_tag() }}
+                    {{ password_change_form.csrf_token }}
+                    <p>
+                        {{ password_change_form.old_password.label }}
+                        <br>
+                        {{ password_change_form.old_password(class="form-control", type="password") }}
+                        {% for error in password_change_form.old_password.errors %}
+                            <p class="alert alert-danger mt-2" role="alert">
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+                    </p>
+                    <p>
+                        {{ password_change_form.new_password.label }}
+                        <br>
+                        {{ password_change_form.new_password(class="form-control", type="password") }}
+                        {% for error in password_change_form.new_password.errors %}
+                            <p class="alert alert-danger mt-2" role="alert">
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+                    </p>
+                    <p>
+                        {{ password_change_form.new_password_repeat.label }}
+                        <br>
+                        {{ password_change_form.new_password_repeat(class="form-control", type="password") }}
+                        {% for error in password_change_form.new_password_repeat.errors %}
+                            <p class="alert alert-danger mt-2" role="alert">
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+                    </p>
+                    <p class="text-danger">{{ password_error_message }}</p>
+                    <p class="ml-2">{{ password_change_form.submit(type="submit", class="btn btn-primary", form="password_change") }}</p>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>window.onload = function(){document.getElementById("email").value = "{{ current_user.email }}";}</script>
+</div>
+{% endblock %}

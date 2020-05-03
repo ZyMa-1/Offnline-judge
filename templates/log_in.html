@@ -2,31 +2,34 @@
 
 {% block content %}
 <div class="sign_up_form mx-auto">
-    <h3 align="center">Log in Offnline Judge</h3>
-    <form action="" method="post">
+    <form class="base_form" action="" method="post">
         {{ form.hidden_tag() }}
         {{ form.csrf_token }}
+        <h3 align="center">Log in Offnline Judge</h3>
+        <br>
         <p>
-            {{ form.login.label }}<br>
-            {{ form.login(class="form-control") }}<br>
+            {{ form.login.label }}
+            <br>
+            {{ form.login(class="form-control") }}
             {% for error in form.login.errors %}
-                <p class="alert alert-danger" role="alert">
+                <p class="alert alert-danger mt-2" role="alert">
                     {{ error }}
                 </p>
             {% endfor %}
         </p>
         <p>
-            {{ form.password.label }}<br>
-            {{ form.password(class="form-control", type="password") }}<br>
+            {{ form.password.label }}
+            <br>
+            {{ form.password(class="form-control", type="password") }}
             {% for error in form.password.errors %}
-                <p class="alert alert-danger" role="alert">
+                <p class="alert alert-danger mt-2" role="alert">
                     {{ error }}
                 </p>
             {% endfor %}
         </p>
         <p class="text-danger">{{ error_message }}</p>
         <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        <p align="center">{{ form.submit(type="submit", class="btn btn-primary btn-lg") }}</p>
     </form>
 </div>
 {% endblock %}

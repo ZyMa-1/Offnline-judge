@@ -18,8 +18,25 @@ class LogInForm(FlaskForm):
     login = StringField('Login', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember me')
-    submit = SubmitField('Submit')
+    submit = SubmitField('Log in')
 
 
 class SubmitForm(FlaskForm):
     submit = SubmitField('Submit')
+
+
+class PasswordChangeForm(FlaskForm):
+    old_password = PasswordField('Old password', validators=[DataRequired()])
+    new_password = PasswordField('New password', validators=[DataRequired()])
+    new_password_repeat = PasswordField('Repeat new password', validators=[DataRequired()])
+    submit = SubmitField('Change password')
+
+
+class EmailChangeForm(FlaskForm):
+    email = EmailField('Email', validators=[DataRequired()])
+    submit = SubmitField('Change email')
+
+
+class IconChangeForm(FlaskForm):
+    icon = FileField("", validators=[FileAllowed(['jpg', 'png'], "Image")])
+    submit = SubmitField('Change icon')

@@ -19,8 +19,11 @@ body {
 .navbar-right{
     margin-right: 15rem;
 }
-.sign_up_form{
-    max-width: 600px;
+form.base_form{
+    max-width: 450px;
+    justify-content: center !important;
+    margin: auto;
+    margin-top: 10%;
 }
 hr.solid_sep{
     margin-top: 1rem;
@@ -166,4 +169,14 @@ img.profile_icon{
 }
 div.adj{
     display: inline-block;
+}
+.small_font{
+font-size: 9pt;
+}
+div.profile_icon_box{
+max-width: 230px;
+}
+div.border{
+    border-radius: 5%;
+    border-top: 2px solid rgba(0, 0, 0, 0.1);
 }

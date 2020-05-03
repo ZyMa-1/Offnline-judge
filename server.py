@@ -6,6 +6,8 @@ from wt_forms import *
 
 from data.db_models import db_session
 
+from copy import copy
+
 from data.db_models.submissions import *
 from data.db_models.problems import *
 from data.db_models.users import *
@@ -19,11 +21,74 @@ import multiprocessing
 
 from tester import test_forever
 
+
+def page_not_found_error(error):
+    params = base_params("404 error", -1)
+    return render_template('404.html', **params)
+
+
+def unauthorized_error(error):
+    print(error)
+    params = base_params("401 error", -1)
+    return render_template('401.html', **params)
+
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'This miss is pretty sad, but fuck it (C) WhiteCat'
+app.config["CACHE_TYPE"] = "null"
+
+app.register_error_handler(404, page_not_found_error)
+app.register_error_handler(401, unauthorized_error)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+icon_folder_path = "static/user_data/icons"
+
+
+def resize_image(path, w, h):
+    image = Image.open(path)
+    image = image.resize((w, h))
+    image.save(path)
+
+
+def generate_icon_name():
+    icon_id = randint(100000000, 999999999)
+    icon_name = f"{icon_id}.png"
+    while icon_name in os.listdir(icon_folder_path):
+        icon_id = randint(100000000, 999999999)
+        icon_name = f"{icon_id}.png"
+    return icon_id, icon_name
+
+
+def save_custom_user_icon(icon_data):
+    icon_id, icon_name = generate_icon_name()
+    path_small = f"{icon_folder_path}/small/{icon_name}"
+    path_large = f"{icon_folder_path}/large/{icon_name}"
+    open(path_small, 'wb').write(icon_data)
+    open(path_large, 'wb').write(icon_data)
+    resize_image(path_small, 40, 40)
+    resize_image(path_large, 200, 200)
+    return icon_id
+
+
+def save_default_user_icon():
+    num = randint(1, 3)  # 1-number of default icons
+    icon_id, icon_name = generate_icon_name()
+    path_small = f"{icon_folder_path}/small/{icon_name}"
+    path_large = f"{icon_folder_path}/large/{icon_name}"
+    icon_data = open(f"data/default/user_icons/user_icon_{num}.png", "rb").read()
+    open(path_small, 'wb').write(icon_data)
+    open(path_large, 'wb').write(icon_data)
+    resize_image(path_small, 40, 40)
+    resize_image(path_large, 200, 200)
+    return icon_id
+
+
+def delete_old_user_icon(icon_id):
+    sleep(.05)
+    os.remove(f"{icon_folder_path}/small/{icon_id}.png")
+    os.remove(f"{icon_folder_path}/large/{icon_id}.png")
 
 
 @login_manager.user_loader
@@ -54,12 +119,6 @@ def after_request(response):
     return response
 
 
-def remove_cache(page_url):
-    response = make_response(url_for(page_url))
-    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response.headers['Pragma'] = 'no-cache'
-
-
 @app.route("/")
 def start_page():
     return redirect('/home')
@@ -84,42 +143,7 @@ def home():
 
 @app.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
-    icon_folder_path = "static/user_data/icons"
-
-    def resize_image(path, w, h):
-        image = Image.open(path)
-        image = image.resize((w, h))
-        image.save(path)
-
-    def generate_icon_name():
-        icon_id = randint(100000000, 999999999)
-        icon_name = f"{icon_id}.png"
-        while icon_name in os.listdir(icon_folder_path):
-            icon_id = randint(100000000, 999999999)
-            icon_name = f"{icon_id}.png"
-        return icon_id, icon_name
-
-    def save_custom_user_icon(icon_data):
-        icon_id, icon_name = generate_icon_name()
-        path_small = f"{icon_folder_path}/small/{icon_name}"
-        path_large = f"{icon_folder_path}/large/{icon_name}"
-        open(path_small, 'wb').write(icon_data)
-        open(path_large, 'wb').write(icon_data)
-        resize_image(path_small, 40, 40)
-        resize_image(path_large, 200, 200)
-        return icon_id
-
-    def save_default_user_icon():
-        num = randint(1, 3)  # 1-number of default icons
-        icon_id, icon_name = generate_icon_name()
-        path_small = f"{icon_folder_path}/small/{icon_name}"
-        path_large = f"{icon_folder_path}/large/{icon_name}"
-        icon_data = open(f"data/default/user_icons/user_icon_{num}.png", "rb").read()
-        open(path_small, 'wb').write(icon_data)
-        open(path_large, 'wb').write(icon_data)
-        resize_image(path_small, 40, 40)
-        resize_image(path_large, 200, 200)
-        return icon_id
+    session = db_session.create_session()
 
     form = SignUpForm()
     params = base_params("Sign up", -1)
@@ -128,7 +152,6 @@ def sign_up():
         if form.password.data != form.password_repeat.data:
             params["password_error_message"] = "Password mismatch"
             return render_template('sign_up.html', **params)
-        session = db_session.create_session()
         if session.query(User).filter(User.login == form.login.data).first():
             params["login_error_message"] = "This username already exists"
             return render_template('sign_up.html', **params)
@@ -297,6 +320,8 @@ def my_submissions():
 
 @app.route('/profile/<int:user_id>', methods=['GET'])
 def profile(user_id):
+    session = db_session.create_session()
+
     def parse_user_statistics(user):
         submissions_results = {
             "AC": 0,
@@ -331,7 +356,6 @@ def profile(user_id):
         ans_dict["accuracy"] = int(round(len(user.problems_solved) / submissions_num, 2) * 100)
         return ans_dict
 
-    session = db_session.create_session()
     params = base_params("Profile", -1)
     params["user"] = session.query(User).get(user_id)
     params["user_statistics"] = parse_user_statistics(params["user"])
@@ -339,6 +363,66 @@ def profile(user_id):
     params["table_headers"] = ["AC", "CE", "WA", "TLE", "MLE", "RE"]
 
     return render_template('profile.html', **params)
+
+
+TEMP_GLOBAL_PARAMS = {}
+
+
+@app.route('/profile/edit', methods=['GET', 'POST'])
+@login_required
+def profile_edit():
+    global TEMP_GLOBAL_PARAMS
+    session = db_session.create_session()
+    user = session.query(User).get(current_user.id)
+    params = base_params("Profile edit", -1)
+    if TEMP_GLOBAL_PARAMS != {}:
+        params = copy(TEMP_GLOBAL_PARAMS)  # idk how to do other way(fix soon)
+        TEMP_GLOBAL_PARAMS = {}
+    params["profile_icon"] = f"/static/user_data/icons/large/{user.icon_id}.png"
+
+    req_ans = str(request.form)
+    is_email_form, is_icon_form, is_password_form = 0, 0, 0
+    if "email" in req_ans:
+        params["email_change_form_visible_errors"] = True
+        is_email_form = 1
+    elif "password" in req_ans:
+        params["password_change_form_visible_errors"] = True
+        is_password_form = 1
+    elif "Change icon" in req_ans:
+        params["icon_change_form_visible_errors"] = True
+        is_icon_form = 1
+    icon_change_form = IconChangeForm()
+    email_change_form = EmailChangeForm()
+    password_change_form = PasswordChangeForm()
+    params["icon_change_form"] = icon_change_form
+    params["email_change_form"] = email_change_form
+    params["password_change_form"] = password_change_form
+    if icon_change_form.validate_on_submit():  # can put one of 3 form, because they all validating(important line)
+        if is_email_form:
+            if session.query(User).filter(User.email == email_change_form.email.data).first():
+                params["email_error_message"] = "This email already linked to another user"
+            else:
+                user.email = email_change_form.email.data
+        if is_icon_form:
+            delete_old_user_icon(user.icon_id)
+            sleep(.05)
+            icon_data = icon_change_form.icon.data.read()
+            if icon_data == b'':
+                icon_id = save_default_user_icon()
+            else:
+                icon_id = save_custom_user_icon(icon_data)
+            user.icon_id = icon_id
+        if is_password_form:
+            if password_change_form.new_password.data != password_change_form.new_password_repeat.data:
+                params["password_error_message"] = "Password mismatch"
+            elif not user.check_password(password_change_form.old_password.data):
+                params["password_error_message"] = "Wrong old password"
+            else:
+                user.set_password(password_change_form.new_password.data)
+        session.commit()
+        TEMP_GLOBAL_PARAMS = params
+        return redirect(url_for('profile_edit'))
+    return render_template('edit_profile.html', **params)
 
 
 if __name__ == '__main__':
