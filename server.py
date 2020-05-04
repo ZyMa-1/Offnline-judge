@@ -2,7 +2,7 @@ from PIL import Image
 from flask import Flask, render_template, url_for, redirect, request, session, abort, make_response, jsonify
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from sqlalchemy import func as sqlalchemy_func
-from wt_forms import *
+from wt_fos import *
 
 from data.db_models import db_session
 

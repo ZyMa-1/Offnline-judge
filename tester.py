@@ -3,8 +3,6 @@ import subprocess
 import os
 from time import sleep
 
-import psutil
-
 from data.db_models import db_session
 from data.db_models import users
 from data.db_models import problems
