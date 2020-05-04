@@ -28,7 +28,6 @@ def page_not_found_error(error):
 
 
 def unauthorized_error(error):
-    print(error)
     params = base_params("401 error", -1)
     return render_template('401.html', **params)
 
@@ -137,8 +136,14 @@ def base_params(title, navbar_active_tab_id):
 
 @app.route("/home")
 def home():
-    params = base_params("Home page", 0)
+    params = base_params("Home", 0)
     return render_template("home_page.html", **params)
+
+
+@app.route("/introduction")
+def introduction():
+    params = base_params("Introduction", -1)
+    return render_template("introduction.html", **params)
 
 
 @app.route('/sign_up', methods=['GET', 'POST'])
@@ -365,20 +370,18 @@ def profile(user_id):
     return render_template('profile.html', **params)
 
 
-TEMP_GLOBAL_PARAMS = {}
-
-
 @app.route('/profile/edit', methods=['GET', 'POST'])
 @login_required
 def profile_edit():
-    global TEMP_GLOBAL_PARAMS
-    session = db_session.create_session()
-    user = session.query(User).get(current_user.id)
+    d_session = db_session.create_session()
+    user = d_session.query(User).get(current_user.id)
     params = base_params("Profile edit", -1)
-    if TEMP_GLOBAL_PARAMS != {}:
-        params = copy(TEMP_GLOBAL_PARAMS)  # idk how to do other way(fix soon)
-        TEMP_GLOBAL_PARAMS = {}
+    if "error_parameters" in session.keys():
+        for key in session["error_parameters"]:
+            params[key] = session["error_parameters"][key]
+        session.pop("error_parameters", None)
     params["profile_icon"] = f"/static/user_data/icons/large/{user.icon_id}.png"
+    params["user_icon"] = f"/static/user_data/icons/small/{user.icon_id}.png"
 
     req_ans = str(request.form)
     is_email_form, is_icon_form, is_password_form = 0, 0, 0
@@ -399,7 +402,7 @@ def profile_edit():
     params["password_change_form"] = password_change_form
     if icon_change_form.validate_on_submit():  # can put one of 3 form, because they all validating(important line)
         if is_email_form:
-            if session.query(User).filter(User.email == email_change_form.email.data).first():
+            if d_session.query(User).filter(User.email == email_change_form.email.data).first():
                 params["email_error_message"] = "This email already linked to another user"
             else:
                 user.email = email_change_form.email.data
@@ -419,8 +422,13 @@ def profile_edit():
                 params["password_error_message"] = "Wrong old password"
             else:
                 user.set_password(password_change_form.new_password.data)
-        session.commit()
-        TEMP_GLOBAL_PARAMS = params
+        d_session.commit()
+        error_params = {}
+        if "email_error_message" in params.keys():
+            error_params["email_error_message"] = params["email_error_message"]
+        if "password_error_message" in params.keys():
+            error_params["password_error_message"] = params["password_error_message"]
+        session["error_parameters"] = error_params
         return redirect(url_for('profile_edit'))
     return render_template('edit_profile.html', **params)
 

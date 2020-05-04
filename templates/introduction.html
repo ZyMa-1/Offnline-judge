@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="problem_tabs nav-expand-lg p-5">
+    <div class="d-flex justify-content-left">
+        <p>This site contains an archive of Olympiad programming tasks with a built-in testing system. To sumbit problem go to practice section, where currently more than 2 problems, paste your code and click on submit button. After submitting system test your solutions on tests and then returns verdict.<br><br>Testing system uses the following compilers:</p>
+    </div>
+    <div class="d-flex justify-content-left">
+        <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#language_1">GNU C++11</button>
+        <br>
+        <div id="language_1" class="collapse col py-2 px-0 ">
+            <div class="card card-body py-2 px-3 ml-3">
+                <p class="m-0">
+                    g++ -static -std=c++11 -o submission.exe submission.cpp
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

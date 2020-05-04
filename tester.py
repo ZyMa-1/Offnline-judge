@@ -41,7 +41,7 @@ def test_submission(submission, results):
     os.rename(f'{submission_path}/{os.listdir(submission_path)[0]}', f'{submission_path}/submission.cpp')
     try:
         subprocess.check_call(
-            f"g++ -static -std=c++14 -o {submission_path}/submission.exe {submission_path}/submission.cpp",
+            f"g++ -static -std=c++11 -o {submission_path}/submission.exe {submission_path}/submission.cpp",
             stderr=open(err_file_path, 'w'))
     except subprocess.CalledProcessError:
         error = open(err_file_path, 'r').read()
