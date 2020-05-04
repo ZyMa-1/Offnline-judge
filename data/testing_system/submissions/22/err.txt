@@ -1,0 +1,2 @@
+data/testing_system/submissions/22/submission.cpp:45:31: error: 'make_v' function uses 'auto' type specifier without trailing return type
+data/testing_system/submissions/22/submission.cpp:45:31: note: deduced return type only available with -std=c++1y or -std=gnu++1y
