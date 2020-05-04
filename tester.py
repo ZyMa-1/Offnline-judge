@@ -85,7 +85,7 @@ def test_submission(submission, results):
                 'running_time': max_running_time
             }
             return delete_temp_files()
-        seconds = current_running_time.microseconds / 1000000 + current_running_time.seconds
+        seconds = current_running_time.microseconds / 1000000
         if test_num == 1:
             seconds -= 0.1
         max_running_time = max(max_running_time, seconds)
