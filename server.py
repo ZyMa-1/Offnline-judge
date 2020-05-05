@@ -4,6 +4,8 @@ from flask_login import LoginManager, login_user, current_user, login_required, 
 from sqlalchemy import func as sqlalchemy_func
 from wt_forms import *
 
+import logging
+
 from data.db_models import db_session
 
 from data.db_models.submissions import *
@@ -97,6 +99,7 @@ def main():
     processes = []
     # db_session.global_init("sqlite:///data/db/main.sqlite")
     db_session.global_init(os.environ("DATABASE_URL"))
+    logging.warning("HERE WE GO")
     p = multiprocessing.Process(target=test_forever)
     processes.append(p)
     p.start()
