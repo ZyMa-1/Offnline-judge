@@ -10,6 +10,8 @@ from data.db_models.submissions import *
 from data.db_models.problems import *
 from data.db_models.users import *
 
+from commands import create_tables
+
 import os
 from random import randint
 
@@ -34,6 +36,8 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = "sad"
 app.config["CACHE_TYPE"] = "null"
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://rrsdyfbspzkpst:8e22731087e1b644a198fc360e3263c98ff8d22126c850799f7e9d700510895f@ec2-52-202-22-140.compute-1.amazonaws.com:5432/datnhrra0kdml8"
+
+app.cli.add_command(create_tables)
 
 app.register_error_handler(404, page_not_found_error)
 app.register_error_handler(401, unauthorized_error)
