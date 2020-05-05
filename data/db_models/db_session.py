@@ -34,9 +34,6 @@ def remote_global_init(db_path):
     if __factory:
         return
 
-    if not db_path or not db_path.strip():
-        raise Exception("Bad db file name")
-
     conn_str = f'{db_path}?check_same_thread=False'
     print(f"Connecting to {db_path}...")
 

@@ -32,7 +32,6 @@ def unauthorized_error(error):
     return render_template('401.html', **params)
 
 
-print("name: ", str(__name__))
 app = Flask(__name__)
 
 app.config.from_pyfile('settings.py')
