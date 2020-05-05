@@ -49,17 +49,6 @@ icon_folder_path = "static/user_data/icons"
 @app.cli.command("create_tables")
 def create_tables():
     db_session.global_init(app.config["SQLALCHEMY_DATABASE_URI"])
-    session = db_session.create_session()
-    user = User(
-        id=1,
-        title="A+B",
-        time_limit=1.0,
-        memory_limit=64,
-        theme="basic_programming"
-    )
-    session.add(user)
-    session.commit()
-    print("SUCCESS")
 
 
 def resize_image(path, w, h):
@@ -325,6 +314,7 @@ def editorial(theme, problem_id):
 
 @app.route('/submissions', methods=['GET'])
 def submissions():
+    db_session.global_init(app.config["SQLALCHEMY_DATABASE_URI"])
     session = db_session.create_session()
     params = base_params("Submissions", 2)
     params["submissions"] = session.query(Submission).order_by(Submission.id.desc()).limit(20).all()
