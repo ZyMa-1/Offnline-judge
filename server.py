@@ -49,6 +49,17 @@ icon_folder_path = "static/user_data/icons"
 @app.cli.command("create_tables")
 def create_tables():
     db_session.global_init(app.config["SQLALCHEMY_DATABASE_URI"])
+    session = db_session.create_session()
+    user = User(
+        id=1,
+        title="A+B",
+        time_limit=1.0,
+        memory_limit=64,
+        theme="basic_programming"
+    )
+    session.add(user)
+    session.commit()
+    print("SUCCESS")
 
 
 def resize_image(path, w, h):
@@ -155,6 +166,7 @@ def introduction():
 
 @app.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
+    db_session.global_init(app.config["SQLALCHEMY_DATABASE_URI"])
     session = db_session.create_session()
 
     form = SignUpForm()
