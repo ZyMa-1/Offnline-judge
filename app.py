@@ -10,6 +10,8 @@ from data.db_models.submissions import *
 from data.db_models.problems import *
 from data.db_models.users import *
 
+from commands import create_tables
+
 import os
 from random import randint
 
@@ -31,11 +33,13 @@ def unauthorized_error(error):
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'This miss is pretty sad, but fuck it (C) WhiteCat'
-app.config["CACHE_TYPE"] = "null"
+
+app.config.from_pyfile('settings.py')
 
 app.register_error_handler(404, page_not_found_error)
 app.register_error_handler(401, unauthorized_error)
+
+app.cli.add_command(create_tables)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
