@@ -6,8 +6,6 @@ from wt_forms import *
 
 from data.db_models import db_session
 
-from copy import copy
-
 from data.db_models.submissions import *
 from data.db_models.problems import *
 from data.db_models.users import *
