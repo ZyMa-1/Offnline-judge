@@ -31,7 +31,9 @@ def unauthorized_error(error):
 
 
 app = Flask(__name__)
-app.config.from_pyfile('settings.py')
+app.config["SECRET_KEY"] = "sad"
+app.config["CACHE_TYPE"] = "null"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://rrsdyfbspzkpst:8e22731087e1b644a198fc360e3263c98ff8d22126c850799f7e9d700510895f@ec2-52-202-22-140.compute-1.amazonaws.com:5432/datnhrra0kdml8"
 
 app.register_error_handler(404, page_not_found_error)
 app.register_error_handler(401, unauthorized_error)
@@ -95,7 +97,7 @@ def load_user(user_id):
 
 def main():
     processes = []
-    db_session.global_init("sqlite:///data/db/main.sqlite")
+    db_session.global_init(app.config["SQLALCHEMY_DATABASE_URI"])
     # db_session.global_init(os.environ("DATABASE_URL"))
     p = multiprocessing.Process(target=test_forever)
     processes.append(p)
