@@ -127,6 +127,7 @@ def after_request(response):
 
 @app.route("/")
 def start_page():
+    db_session.global_init(app.config["SQLALCHEMY_DATABASE_URI"])
     return redirect('/home')
 
 
@@ -314,7 +315,6 @@ def editorial(theme, problem_id):
 
 @app.route('/submissions', methods=['GET'])
 def submissions():
-    db_session.global_init(app.config["SQLALCHEMY_DATABASE_URI"])
     session = db_session.create_session()
     params = base_params("Submissions", 2)
     params["submissions"] = session.query(Submission).order_by(Submission.id.desc()).limit(20).all()
