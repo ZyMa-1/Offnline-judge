@@ -1,3 +1,4 @@
+import click
 from PIL import Image
 from flask import Flask, render_template, url_for, redirect, request, session, abort, make_response, jsonify
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
@@ -9,8 +10,6 @@ from data.db_models import db_session
 from data.db_models.submissions import *
 from data.db_models.problems import *
 from data.db_models.users import *
-
-from commands import create_tables
 
 import os
 from random import randint
@@ -35,9 +34,8 @@ def unauthorized_error(error):
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "sad"
 app.config["CACHE_TYPE"] = "null"
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://rrsdyfbspzkpst:8e22731087e1b644a198fc360e3263c98ff8d22126c850799f7e9d700510895f@ec2-52-202-22-140.compute-1.amazonaws.com:5432/datnhrra0kdml8"
-
-app.cli.add_command(create_tables)
+app.config[
+    "SQLALCHEMY_DATABASE_URI"] = "postgres://rrsdyfbspzkpst:8e22731087e1b644a198fc360e3263c98ff8d22126c850799f7e9d700510895f@ec2-52-202-22-140.compute-1.amazonaws.com:5432/datnhrra0kdml8"
 
 app.register_error_handler(404, page_not_found_error)
 app.register_error_handler(401, unauthorized_error)
@@ -46,6 +44,11 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 icon_folder_path = "static/user_data/icons"
+
+
+@app.cli.command("create_tables")
+def create_tables():
+    db_session.global_init(app.config["SQLALCHEMY_DATABASE_URI"])
 
 
 def resize_image(path, w, h):
