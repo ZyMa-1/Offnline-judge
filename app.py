@@ -101,7 +101,7 @@ def load_user(user_id):
 
 def main():
     processes = []
-    db_session.global_init("data/db/main.sqlite")
+    db_session.remote_global_init("DATABASE_URL")
     p = multiprocessing.Process(target=test_forever)
     processes.append(p)
     p.start()

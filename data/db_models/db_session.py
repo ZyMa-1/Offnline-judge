@@ -28,6 +28,26 @@ def global_init(db_file):
     SqlAlchemyBase.metadata.create_all(engine)
 
 
+def remote_global_init(db_path):
+    global __factory
+
+    if __factory:
+        return
+
+    if not db_path or not db_path.strip():
+        raise Exception("Bad db file name")
+
+    conn_str = f'{db_path}?check_same_thread=False'
+    print(f"Connecting to {db_path}...")
+
+    engine = sa.create_engine(db_path, echo=False)  # (echo True == debug)
+    __factory = orm.sessionmaker(bind=engine)
+
+    from . import __all_models
+
+    SqlAlchemyBase.metadata.create_all(engine)
+
+
 def create_session() -> Session:
     global __factory
     return __factory()
