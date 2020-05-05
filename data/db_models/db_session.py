@@ -17,10 +17,9 @@ def global_init(db_file):
     if not db_file or not db_file.strip():
         raise Exception("Bad db file name")
 
-    conn_str = f'{db_file}?check_same_thread=False'
-    print(f"Connecting to {conn_str}...")
+    print(f"Connecting to {db_file}...")
 
-    engine = sa.create_engine(conn_str, echo=False)  # (echo True == debug)
+    engine = sa.create_engine(db_file, echo=False)  # (echo True == debug)
     __factory = orm.sessionmaker(bind=engine)
 
     from . import __all_models
