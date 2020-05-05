@@ -124,8 +124,8 @@ def test_all_submissions():
 
 
 def test_forever():
-    # db_session.global_init("sqlite:///data/db/main.sqlite")
-    db_session.global_init(os.environ("DATABASE_URL"))
+    db_session.global_init("sqlite:///data/db/main.sqlite")
+    # db_session.global_init(os.environ("DATABASE_URL"))
     while 1:
         test_all_submissions()
         sleep(1)
