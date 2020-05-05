@@ -12,7 +12,7 @@ class Submission(SqlAlchemyBase, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
-    problem_id = sqlalchemy.Column(sqlalchemy.String, sqlalchemy.ForeignKey("problems.id"))
+    problem_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("problems.id"))
     status = sqlalchemy.Column(sqlalchemy.String)
     running_time = sqlalchemy.Column(sqlalchemy.Integer)  # in ms
     sending_time = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.now)
