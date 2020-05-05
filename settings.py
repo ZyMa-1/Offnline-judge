@@ -1,5 +1,5 @@
 import os
 
-SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
-SECRET_KEY = "Offnline judge"
+SQLALCHEMY_DATABASE_URI = 'sqlite:///data/db/main.sqlite'
+SECRET_KEY = "sad"
 CACHE_TYPE = "null"
