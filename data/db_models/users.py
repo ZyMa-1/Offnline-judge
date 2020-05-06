@@ -20,8 +20,8 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
                                    secondary="users_to_solved_problems",
                                    backref="users_solved", lazy='subquery')  # many-to-many
     problems_unsolved = orm.relation("Problem",
-                                   secondary="users_to_unsolved_problems",
-                                   backref="users_unsolved", lazy='subquery')  # many-to-many
+                                     secondary="users_to_unsolved_problems",
+                                     backref="users_unsolved", lazy='subquery')  # many-to-many
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)

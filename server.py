@@ -20,6 +20,12 @@ import multiprocessing
 
 from tester import test_forever
 
+from flask_restful import reqparse, abort, Api, Resource
+
+import users_resources
+import submissions_resources
+import problems_resources
+
 
 def page_not_found_error(error):
     params = base_params("404 error", -1)
@@ -31,14 +37,31 @@ def unauthorized_error(error):
     return render_template('401.html', **params)
 
 
+def internal_error(error):
+    params = base_params("500 error", -1)
+    return render_template('500.html', **params)
+
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "sad"
 app.config["CACHE_TYPE"] = "null"
 app.config[
     "SQLALCHEMY_DATABASE_URI"] = "postgres://rrsdyfbspzkpst:8e22731087e1b644a198fc360e3263c98ff8d22126c850799f7e9d700510895f@ec2-52-202-22-140.compute-1.amazonaws.com:5432/datnhrra0kdml8"
 
+api = Api(app)
+
+api.add_resource(users_resources.UserResource, '/api/v1/user/<int:user_id>')
+api.add_resource(users_resources.UsersListResource, '/api/v1/users')
+
+api.add_resource(submissions_resources.SubmissionResource, '/api/v1/submission/<int:submission_id>')
+api.add_resource(submissions_resources.SubmissionsListResource, '/api/v1/submissions')
+
+api.add_resource(problems_resources.ProblemResource, '/api/v1/problem/<int:problem_id>')
+api.add_resource(problems_resources.ProblemsListResource, '/api/v1/problems')
+
 app.register_error_handler(404, page_not_found_error)
 app.register_error_handler(401, unauthorized_error)
+app.register_error_handler(500, internal_error)
 
 login_manager = LoginManager()
 login_manager.init_app(app)

@@ -19,7 +19,7 @@ def global_init(db_file):
 
     print(f"Connecting to {db_file}...")
 
-    engine = sa.create_engine(db_file, echo=False)  # (echo True == debug)
+    engine = sa.create_engine(db_file, echo=False, pool_size=10, max_overflow=20)  # (echo True == debug)
     __factory = orm.sessionmaker(bind=engine)
 
     from . import __all_models
