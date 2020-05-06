@@ -1,6 +1,0 @@
-1) api
-2) tests for api
-3) upd introduction page
-4) readme.md(beuty pls(example: https://github.com/sthuber90/serverless-offline/blob/master/README.md) ) - 5 may (X)
-5) try to upd tester.py(he can't detect RE and MLE(sad, but true))
-6) find some person that can evaluate my project
