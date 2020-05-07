@@ -1,5 +1,7 @@
 # Offnline judge
 
+![](readme_screenshots/home.png)
+
 Offnline judge is a platform where you can improve your programming skills and learn new algoritms. 
 The platform includes a `testing system`, `archive of tasks`, `statistics of users` and their `submissions`
 
@@ -9,7 +11,9 @@ The platform includes a `testing system`, `archive of tasks`, `statistics of use
 ```
 pip install -r requirements.txt
 ```
-* Second launch application and open [link](http://localhost:8080)
+* Download [wingw compiler](https://osdn.net/projects/mingw/releases) if it is not installed
+* Add mingw to system PATH variable
+* Launch application and open [link](http://localhost:8080)
 ```
 python3 server.py
 ```
