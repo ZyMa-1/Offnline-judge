@@ -7,7 +7,7 @@ The platform includes a `testing system`, `archive of tasks`, `statistics of use
 
 ## Getting Started
 
-* First download project, install `python 3.6(or higher)` and all required libraries by running command below:
+* First download project, install `python 3.8(or higher)` and all required libraries by running command below:
 ```
 pip install -r requirements.txt
 ```
