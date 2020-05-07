@@ -1,9 +1,9 @@
 # Offnline judge
 
-![](readme_screenshots/home.png)
-
 Offnline judge is a platform where you can improve your programming skills and learn new algoritms. 
 The platform includes a `testing system`, `archive of tasks`, `statistics of users` and their `submissions`
+
+![](readme_screenshots/home.png)
 
 ## Getting Started
 
