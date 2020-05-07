@@ -26,6 +26,8 @@ import users_resources
 import submissions_resources
 import problems_resources
 
+import psycopg2
+
 
 def page_not_found_error(error):
     params = base_params("404 error", -1)
@@ -45,8 +47,8 @@ def internal_error(error):
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "sad"
 app.config["CACHE_TYPE"] = "null"
-app.config[
-    "SQLALCHEMY_DATABASE_URI"] = "postgres://rrsdyfbspzkpst:8e22731087e1b644a198fc360e3263c98ff8d22126c850799f7e9d700510895f@ec2-52-202-22-140.compute-1.amazonaws.com:5432/datnhrra0kdml8"
+# app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://rrsdyfbspzkpst:8e22731087e1b644a198fc360e3263c98ff8d22126c850799f7e9d700510895f@ec2-52-202-22-140.compute-1.amazonaws.com:5432/datnhrra0kdml8"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data/db/main.sqlite?check_same_thread=False"
 
 api = Api(app)
 
@@ -126,9 +128,18 @@ def load_user(user_id):
 
 
 def main():
+    """
+    conn_string = "host='ec2-52-202-22-140.compute-1.amazonaws.com' dbname='datnhrra0kdml8' user='rrsdyfbspzkpst' password='8e22731087e1b644a198fc360e3263c98ff8d22126c850799f7e9d700510895f'"
+    conn = psycopg2.connect(conn_string)
+    c = conn.cursor()
+    c.execute("SET SESSION idle_in_transaction_session_timeout = '5s';")
+    conn.commit()
+    conn.close()
+    sleep(.1)
+    """
     processes = []
-    db_session.global_init(app.config["SQLALCHEMY_DATABASE_URI"])
     # db_session.global_init(os.environ("DATABASE_URL"))
+    db_session.global_init(app.config["SQLALCHEMY_DATABASE_URI"])
     p = multiprocessing.Process(target=test_forever)
     processes.append(p)
     p.start()

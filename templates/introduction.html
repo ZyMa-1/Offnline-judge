@@ -16,5 +16,37 @@
             </div>
         </div>
     </div>
+    <br><br><br>
+    <table class="table status_table table-bordered">
+        <tr>
+            <th class="status_center"><pre>Status</pre></th>
+            <th class="status_center"><pre>Event</pre></th>
+        </tr>
+        <tr>
+            <td class="status_center"><pre class="text-success">AC</pre></td>
+            <td class="status"><pre>Accepted. Program works correctly and passed all tests</pre></td>
+        </tr>
+        <tr>
+            <td class="status_center"><pre class="text-warning">CE</pre></td>
+            <td class="status"><pre>Compilation error. Syntax error in the program or the file extension is specified incorrectly</pre></td>
+        </tr>
+        <tr>
+            <td class="status_center"><pre class="text-danger">WA</pre></td>
+            <td class="status"><pre>Wrong answer. The result of the program does not match with correct answer</pre></td>
+        </tr>
+        <tr>
+            <td class="status_center"><pre class="text-danger">TLE</pre></td>
+            <td class="status"><pre>Time limit exceeded. Program runs longer than the installed time</pre></td>
+        </tr>
+        <tr>
+            <td class="status_center"><pre class="text-danger">MLE</pre></td>
+            <td class="status"><pre>Memory limit exceeded. Program uses more than the installed memory size</pre></td>
+        </tr>
+        <tr>
+            <td class="status_center"><pre class="text-danger">RE</pre></td>
+            <td class="status"><pre>Runtime error. Program terminated with a non-zero return code.
+Mostly causes by array overflow or division by zero</pre></td>
+        </tr>
+    </table>
 </div>
 {% endblock %}

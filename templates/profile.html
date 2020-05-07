@@ -21,7 +21,7 @@
                     <p class="mt-1">Problems solved: {{ user.problems_solved|length }}</p>
                     <p class="mt-1">Accuracy: {{ user_statistics["accuracy"] }}%</p>
                     <p class="mt-1">Languages: {% for language in  user_statistics["languages"] %}{{ language }}{% endfor %}</p>
-                    {% if current_user.is_authenticated %}
+                    {% if current_user.is_authenticated and current_user.id == user.id %}
                         <p class="mt-1">Email: {{ current_user.email }} (not visible)</p>
                     {% endif %}
                 </div>

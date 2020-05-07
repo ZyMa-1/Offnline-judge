@@ -3,6 +3,10 @@
 {% block content %}
 <div class="problem_tabs nav-expand-lg px-3">
     <div class="problem_content mx-5 pt-4">
+        <div class="container">
+            <button onclick="location.href='/profile/{{ current_user.id }}'" class="btn btn-primary" type="button">←</button>
+        </div>
+        <br>
         <div class="row">
             <div class="col-sm-3 profile_icon_box">
                 <img class="profile_icon" src="{{ profile_icon }}">

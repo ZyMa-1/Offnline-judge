@@ -109,7 +109,10 @@ def test_all_submissions():
     session = db_session.create_session()
     submissions = session.query(Submission).filter(Submission.status == "In queue")
     for submission in submissions:
-        test_submission(submission, res)
+        try:
+            test_submission(submission, res)
+        except sqlalchemy.exc.OperationalError:
+            continue
         submission.status = res[submission.id]['status']
         submission.running_time = res[submission.id]['running_time']
         if submission.status == "AC":
@@ -118,13 +121,14 @@ def test_all_submissions():
             if submission.problem not in submission.user.problems_solved:
                 submission.user.problems_solved.append(submission.problem)
         else:
-            if submission.problem not in submission.user.problems_unsolved:
+            if submission.problem not in submission.user.problems_unsolved and submission.problem not in submission.user.problems_solved:
                 submission.user.problems_unsolved.append(submission.problem)
         session.commit()
 
 
 def test_forever():
-    db_session.global_init("postgres://rrsdyfbspzkpst:8e22731087e1b644a198fc360e3263c98ff8d22126c850799f7e9d700510895f@ec2-52-202-22-140.compute-1.amazonaws.com:5432/datnhrra0kdml8")
+    # db_session.global_init("postgres://rrsdyfbspzkpst:8e22731087e1b644a198fc360e3263c98ff8d22126c850799f7e9d700510895f@ec2-52-202-22-140.compute-1.amazonaws.com:5432/datnhrra0kdml8")
+    db_session.global_init("sqlite:///data/db/main.sqlite?check_same_thread=False")
     while 1:
         test_all_submissions()
         sleep(1)

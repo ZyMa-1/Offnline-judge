@@ -180,3 +180,18 @@ div.border{
     border-radius: 5%;
     border-top: 2px solid rgba(0, 0, 0, 0.1);
 }
+.status{
+    padding: 0.5rem;
+    margin: 0;
+    margin-bottom: 0.2rem;
+}
+.status_center{
+    padding: 0.5rem;
+    padding-bottom: 0.3rem;
+    margin: 0;
+    text-align: center;
+}
+.status_table{
+font-size: 13pt;
+width:100px;
+}
