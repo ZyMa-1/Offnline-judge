@@ -18,10 +18,10 @@ pip install -r requirements.txt
 python3 server.py
 ```
 ### Submissions
-You can register new account or login into existing account
+You can register new account or login into existing account.
 To submit solutions required to be registered in the system.
 Go to the practice section choose problem to submit. The solution can be written in the built-in editor or pasted from the clipboard.
-When solution submitted, wait until your solution is tested. When it's tested **submission status** will change. To see more about status meaning go to [link](http://localhost:8080/introduction)
+When solution submitted, wait until your solution is tested. When it's tested **submission status** will change. To see more about status go to [link](http://localhost:8080/introduction)
 
 ### Profile
 In your profile, you can see your `submissions accuracy`, which `problems you solved`, which `problems you unsolved`
