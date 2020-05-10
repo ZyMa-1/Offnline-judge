@@ -1,27 +1,27 @@
 # Offnline judge
 
-![](readme_screenshots/home.png)
-
 Offnline judge is a platform where you can improve your programming skills and learn new algoritms. 
 The platform includes a `testing system`, `archive of tasks`, `statistics of users` and their `submissions`
 
+![](readme_screenshots/home.png)
+
 ## Getting Started
 
-* First download project, install `python 3.6(or higher)` and all required libraries by running command below:
+* First download project, install `python 3.8(or higher)` and all required libraries by running command below:
 ```
 pip install -r requirements.txt
 ```
-* Download [wingw compiler](https://osdn.net/projects/mingw/releases) if it is not installed
-* Add mingw to system PATH variable
+* Download [wingw compiler](https://drive.google.com/file/d/1a4LbO3-ZSq2ixbyfQfigu3aXpECScPhy) if it is not installed
+* Add mingw\bin folder to PATH variable
 * Launch application and open [link](http://localhost:8080)
 ```
 python3 server.py
 ```
 ### Submissions
-You can register new account or login into existing account
+You can register new account or login into existing account.
 To submit solutions required to be registered in the system.
 Go to the practice section choose problem to submit. The solution can be written in the built-in editor or pasted from the clipboard.
-When solution submitted, wait until your solution is tested. When it's tested **submission status** will change. To see more about status meaning go to [link](http://localhost:8080/introduction)
+When solution submitted, wait until your solution is tested. When it's tested **submission status** will change. To see more about status go to [link](http://localhost:8080/introduction)
 
 ### Profile
 In your profile, you can see your `submissions accuracy`, which `problems you solved`, which `problems you unsolved`
