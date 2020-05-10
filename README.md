@@ -11,8 +11,8 @@ The platform includes a `testing system`, `archive of tasks`, `statistics of use
 ```
 pip install -r requirements.txt
 ```
-* Download [wingw compiler](https://osdn.net/projects/mingw/releases) if it is not installed
-* Add mingw to system PATH variable
+* Download [wingw compiler](https://drive.google.com/open?id=1eLAzuJvGArErKAs5IzqOi8ZOIIDruYkH) if it is not installed
+* Add mingw\bin folder to PATH variable
 * Launch application and open [link](http://localhost:8080)
 ```
 python3 server.py
