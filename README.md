@@ -17,6 +17,8 @@ pip install -r requirements.txt
 ```
 python3 server.py
 ```
+## About project
+
 ### Submissions
 You can register new account or login into existing account.
 To submit solutions required to be registered in the system.
