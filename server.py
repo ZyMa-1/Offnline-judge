@@ -296,13 +296,18 @@ def problem(theme, problem_id):
             submission_id = session.query(sqlalchemy_func.max(Submission.id)).one()[0] + 1
         submission_folder = f'data/testing_system/submissions/{submission_id}'
         os.mkdir(f'data/testing_system/submissions/{submission_id}')
-        open(f"{submission_folder}/solution.cpp", "w").writelines([line.rstrip('\n') for line in code])
+        language = request.form["language"]
+        if language == "cpp":
+            open(f"{submission_folder}/solution.cpp", "w").writelines([line.rstrip('\n') for line in code])
+        if language == "py":
+            open(f"{submission_folder}/solution.py", "w").writelines([line.rstrip('\n') for line in code])
         submission = Submission(
             id=submission_id,
             user_id=current_user.id,
             problem_id=problem_id,
             status="In queue",
             running_time=0,
+            language=language
         )
         session.add(submission)
         session.commit()
@@ -331,8 +336,11 @@ def my_submissions_on_problem(theme, problem_id):
 def submission(submission_id):
     session = db_session.create_session()
     params = base_params("Submission", 1)
-    params["code"] = open(f"data/testing_system/submissions/{submission_id}/submission.cpp", "r").read()
     params["submission"] = session.query(Submission).get(submission_id)
+    if params["submission"].language == "cpp":
+        params["code"] = open(f"data/testing_system/submissions/{submission_id}/submission.cpp", "r").read()
+    if params["submission"].language == "py":
+        params["code"] = open(f"data/testing_system/submissions/{submission_id}/submission.py", "r").read()
     return render_template('submission.html', **params)
 
 

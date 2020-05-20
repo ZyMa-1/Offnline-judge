@@ -1,0 +1,3 @@
+data/testing_system/submissions/10/submission.cpp:1:6: error: expected constructor, destructor, or type conversion before '(' token
+ print(sum(map(int, input().split())))
+      ^

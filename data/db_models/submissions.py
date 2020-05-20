@@ -15,6 +15,7 @@ class Submission(SqlAlchemyBase, SerializerMixin):
     problem_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("problems.id"))
     status = sqlalchemy.Column(sqlalchemy.String)
     running_time = sqlalchemy.Column(sqlalchemy.Integer)  # in ms
+    language = sqlalchemy.Column(sqlalchemy.String)
     sending_time = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.now)
     user = orm.relation("User")
     problem = orm.relation("Problem")

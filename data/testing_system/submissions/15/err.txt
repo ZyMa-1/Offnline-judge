@@ -1,0 +1,3 @@
+data/testing_system/submissions/15/submission.cpp:1:1: error: 'test' does not name a type
+ test
+ ^

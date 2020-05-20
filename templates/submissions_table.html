@@ -37,7 +37,11 @@
                 <pre class="mb-0 px-0 py-1">{{ ((submission.sending_time)|string).split('.')[0] }}</pre>
             </td>
             <td class="submission_item">
-                <pre class="mb-0 px-0 py-1">GNU C++11</pre>
+                {% if submission.language == "cpp" %}
+                    <pre class="mb-0 px-0 py-1">GNU C++11</pre>
+                {% elif submission.language == "py" %}
+                    <pre class="mb-0 px-0 py-1">Python 3.6</pre>
+                {% endif %}
             </td>
             {% if submission.status == "AC" %}
                 <td class="submission_item alert-success">

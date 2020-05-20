@@ -40,3 +40,7 @@ class EmailChangeForm(FlaskForm):
 class IconChangeForm(FlaskForm):
     icon = FileField("", validators=[FileAllowed(['jpg', 'png'], "Image")])
     submit = SubmitField('Change icon')
+
+
+class EmptyForm(FlaskForm):
+    pass

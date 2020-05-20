@@ -18,10 +18,11 @@ def test_submission(submission, results):
 
     def delete_temp_files():
         sleep(1)
-        try:
-            os.remove(f'{submission_path}/submission.exe')
-        except Exception:
-            pass
+        if submission.language == "cpp":
+            try:
+                os.remove(f'{submission_path}/submission.exe')
+            except Exception:
+                pass
         try:
             os.remove(f'{submission_path}/input.txt')
         except Exception:
@@ -36,11 +37,15 @@ def test_submission(submission, results):
             pass
 
     err_file_path = f'{submission_path}/err.txt'
-    os.rename(f'{submission_path}/{os.listdir(submission_path)[0]}', f'{submission_path}/submission.cpp')
+    if submission.language == "cpp":
+        os.rename(f'{submission_path}/{os.listdir(submission_path)[0]}', f'{submission_path}/submission.cpp')
+    else:
+        os.rename(f'{submission_path}/{os.listdir(submission_path)[0]}', f'{submission_path}/submission.py')
     try:
-        subprocess.check_call(
-            f"g++ -static -std=c++11 -o {submission_path}/submission.exe {submission_path}/submission.cpp",
-            stderr=open(err_file_path, 'w'))
+        if submission.language == "cpp":
+            subprocess.check_call(
+                f"g++ -static -std=c++11 -o {submission_path}/submission.exe {submission_path}/submission.cpp",
+                stderr=open(err_file_path, 'w'))
     except subprocess.CalledProcessError:
         error = open(err_file_path, 'r').read()
         if "does not name a type" in error or "undefined" in error:
@@ -63,11 +68,18 @@ def test_submission(submission, results):
         open(f'{submission_path}/input.txt', 'w').write(input)
         start = datetime.now()
         try:
-            subprocess.check_call(
-                f"{submission_path}/submission.exe",
-                stdin=open(f"{submission_path}/input.txt", "r"),
-                stdout=open(f"{submission_path}/output.txt", "w"),
-                timeout=submission.problem.time_limit)
+            if submission.language == "cpp":
+                subprocess.check_call(
+                    f"{submission_path}/submission.exe",
+                    stdin=open(f"{submission_path}/input.txt", "r"),
+                    stdout=open(f"{submission_path}/output.txt", "w"),
+                    timeout=submission.problem.time_limit)
+            if submission.language == "py":
+                subprocess.check_call(
+                    f"py {submission_path}/submission.py",
+                    stdin=open(f"{submission_path}/input.txt", "r"),
+                    stdout=open(f"{submission_path}/output.txt", "w"),
+                    timeout=submission.problem.time_limit)
             current_running_time = datetime.now() - start
         except subprocess.TimeoutExpired:
             sleep(.5)
