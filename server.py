@@ -143,7 +143,7 @@ def main():
     p = multiprocessing.Process(target=test_forever)
     processes.append(p)
     p.start()
-    p = multiprocessing.Process(target=app.run(port=8080))
+    p = multiprocessing.Process(target=app.run(port=8080, host='0.0.0.0')) # host='0.0.0.0'-run on local network with ip
     processes.append(p)
     p.start()
     for process in processes:
