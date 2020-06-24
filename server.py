@@ -143,7 +143,7 @@ def main():
     p = multiprocessing.Process(target=test_forever)
     processes.append(p)
     p.start()
-    p = multiprocessing.Process(target=app.run(port=8080, host='0.0.0.0')) # host='0.0.0.0'-run on local network with ip
+    p = multiprocessing.Process(target=app.run(port=8080, threaded=True))  # host='0.0.0.0'-run on local network with ip
     processes.append(p)
     p.start()
     for process in processes:
@@ -298,9 +298,11 @@ def problem(theme, problem_id):
         os.mkdir(f'data/testing_system/submissions/{submission_id}')
         language = request.form["language"]
         if language == "cpp":
-            open(f"{submission_folder}/solution.cpp", "w").writelines([line.rstrip('\n') for line in code])
+            open(f"{submission_folder}/solution.cpp", "wb").writelines(
+                [line.rstrip('\n').encode(encoding='UTF-8', errors='strict') for line in code])
         if language == "py":
-            open(f"{submission_folder}/solution.py", "w").writelines([line.rstrip('\n') for line in code])
+            open(f"{submission_folder}/solution.py", "wb").writelines(
+                [line.rstrip('\n').encode(encoding='UTF-8', errors='strict') for line in code])
         submission = Submission(
             id=submission_id,
             user_id=current_user.id,

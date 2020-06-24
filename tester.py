@@ -48,14 +48,14 @@ def test_submission(submission, results):
                 stderr=open(err_file_path, 'w'))
     except subprocess.CalledProcessError:
         error = open(err_file_path, 'r').read()
-        if "does not name a type" in error or "undefined" in error:
+        if "does not name a type" in error or "undefined" in error or "expected" in error:
             results[submission.id] = {
                 'status': 'CE',
                 'running_time': 0
             }
         else:
             results[submission.id] = {
-                'status': 'MLE 1',
+                'status': 'RE 1',
                 'running_time': 0
             }
         return delete_temp_files()
