@@ -46,9 +46,12 @@ def test_submission(submission, results):
             subprocess.check_call(
                 f"g++ -static -std=c++11 -o {submission_path}/submission.exe {submission_path}/submission.cpp",
                 stderr=open(err_file_path, 'w'))
+        if submission.language == "py":
+            subprocess.check_call(
+                f"py {submission_path}/submission.py", stderr=open(err_file_path, 'w'))
     except subprocess.CalledProcessError:
         error = open(err_file_path, 'r').read()
-        if "does not name a type" in error or "undefined" in error or "expected" in error:
+        if "does not name a type" in error or "undefined" in error or "expected" in error or "SyntaxError" in error:
             results[submission.id] = {
                 'status': 'CE',
                 'running_time': 0
