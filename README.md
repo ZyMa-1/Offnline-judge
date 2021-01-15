@@ -38,7 +38,7 @@ To get information about one user go to the [link](http://localhost:8080/api/v1/
 ***
 
 ## Technologies
-To create this project following libraries following technologies were used:
+To create this project following libraries and technologies were used:
 * [Flask framework](https://flask.palletsprojects.com/en/1.1.x/)
 * [WT forms](https://wtforms.readthedocs.io/en/2.3.x/)
 * [multiprocessing](https://docs.python.org/2/library/multiprocessing.html)
